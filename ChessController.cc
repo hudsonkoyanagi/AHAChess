@@ -1,6 +1,20 @@
 #include "ChessController.h"
 
+#include <iostream>
+#include <sstream>
+#include <string>
 
 void ChessController::input_loop() {
-    while(true){};
+  std::vector<std::string> tokens;
+  std::string line;
+
+  while (std::getline(std::cin, line)) {
+    tokens.clear();
+
+    std::istringstream stream(line);
+    std::string word;
+    while (stream >> word) tokens.push_back(word);
+
+
+    if(tokens[0] == "")
 }
