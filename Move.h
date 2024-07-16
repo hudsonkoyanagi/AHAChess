@@ -3,9 +3,12 @@
 #include "Cord.h"
 
 class Move {
-    bool is_resign = false;
+    public:
+    // bool is_resign = false;
     Cord start;
     Cord end;
+    
+    Move(Cord s, Cord e);
 };
 
 #endif

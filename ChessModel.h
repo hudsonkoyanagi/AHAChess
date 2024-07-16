@@ -17,7 +17,7 @@ private:
     std::array<char, 8> white_pieces;
     std::array<char, 8> black_pieces;
 
-    bool white_to_move = true;
+
     bool white_in_check = false;
     bool black_in_check = false;
     bool white_in_mate = false;
