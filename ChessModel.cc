@@ -46,3 +46,9 @@ ChessModel::~ChessModel() {
     }
   }
 }
+
+
+
+ChessModel::setup_start(){
+  
+}

@@ -106,7 +106,8 @@ void ChessController::input_loop() {
 
     if (p1_good && p2_good) game_loop();
   } else if (command == "setup") {
-    // TODO handle setup
+    setup_loop();
+    //setup_loop
     std::cout << "Not implemented\n";
     exit(1);
   } else {
@@ -160,4 +161,8 @@ void ChessController::game_loop() {
     } else {
     }
   }
+}
+
+void ChessController::setup_loop() {
+  model->setup_start();
 }
