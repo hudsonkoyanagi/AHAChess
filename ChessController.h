@@ -7,6 +7,8 @@ private:
     ChessModel* model;
 public:
     void input_loop();
+
+    ChessController(ChessModel* m) : model{m} {}
 };
 
 #endif

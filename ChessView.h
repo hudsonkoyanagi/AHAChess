@@ -1,5 +1,5 @@
-#ifndef CHESS_MODEL_H
-#define CHESS_MODEL_H
+#ifndef CHESS_VIEW_H
+#define CHESS_VIEW_H
 #include <array>
 
 class Piece;

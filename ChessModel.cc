@@ -4,7 +4,7 @@
 #include "Piece.h"
 
 // Inits to starting board
-ChessModel::ChessModel() : pawn_to_promote{-1,-1} {
+ChessModel::ChessModel(ChessTextView* v) : view{v}, pawn_to_promote{-1,-1} {
   board[0][0] = new Piece{'r', Cord{0,0}, BLACK, ROOK};
   board[0][1] = new Piece{'n', Cord{0,1}, BLACK, KNIGHT};
   board[0][2] = new Piece{'b', Cord{0,2}, BLACK, BISHOP};
