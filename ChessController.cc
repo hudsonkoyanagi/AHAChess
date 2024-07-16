@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 
-#include "Player.h"
 #include "ChessModel.h"
+#include "Player.h"
 
 bool is_valid_cord(const std::string& str) {
   return ((str.length() == 2) && ('a' <= str[0] && str[0] <= 'h') &&
@@ -43,7 +43,7 @@ void ChessController::input_loop() {
         delete p1;
         p1 = nullptr;
         p1_good = true;
-      } else if(is_valid_computer(second)) {
+      } else if (is_valid_computer(second)) {
         delete p1;
         p1_good = true;
         switch (second[8]) {
@@ -105,16 +105,15 @@ void ChessController::input_loop() {
                   << ". Please try again.\n";
       }
 
-
-    if (p1_good && p2_good) game_loop();
-  } else if (command == "setup") {
-    setup_loop();
-    //setup_loop
-    std::cout << "Not implemented\n";
-    exit(1);
-  } else {
-    std::cout << "Invalid command: " << command << ". Please try again. \n";
-
+      if (p1_good && p2_good) game_loop();
+    } else if (command == "setup") {
+      setup_loop();
+      // setup_loop
+      std::cout << "Not implemented\n";
+      exit(1);
+    } else {
+      std::cout << "Invalid command: " << command << ". Please try again. \n";
+    }
   }
 }
 
@@ -130,7 +129,8 @@ void ChessController::game_loop() {
         std::cout << "Invalid chess coordinates, try again\n";
       }
 
-      MOVE_RESULTS res = model->make_move(Move{str_to_cord(start), str_to_cord(end)});
+      MOVE_RESULTS res =
+          model->make_move(Move{str_to_cord(start), str_to_cord(end)});
       switch (res) {
         case INVALID_MOVE:
           std::cout << "Invalid move played, try again\n";
@@ -155,7 +155,7 @@ void ChessController::game_loop() {
           std::cout << "White is in check.\n";
           break;
         case SUCCESS:
-          std::cout << "DEBUG: made move\n"; 
+          std::cout << "DEBUG: made move\n";
         default:
           break;
       }
@@ -166,6 +166,4 @@ void ChessController::game_loop() {
   }
 }
 
-void ChessController::setup_loop() {
-  model->setup_start();
-}
+void ChessController::setup_loop() { model->setup_start(); }

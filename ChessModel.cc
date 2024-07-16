@@ -50,7 +50,7 @@ ChessModel::~ChessModel() {
 
 
 
-ChessModel::setup_start(){}
+void ChessModel::setup_start(){}
   
 
 MOVE_RESULTS ChessModel::make_move(Move m) {
