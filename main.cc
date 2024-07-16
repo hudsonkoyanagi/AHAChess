@@ -1,10 +1,11 @@
 #include "ChessController.h"
 #include "ChessModel.h"
 #include "ChessTextView.h"
+#include "ChessGraphicView.h"
 
 int main() {
 
-    ChessTextView view;
+    ChessGraphicView view;
     ChessModel model{&view};
     ChessController controller{&model};
 
