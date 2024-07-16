@@ -15,5 +15,4 @@ private:
     void render();
     void update(Piece* a, Piece* b);
 };
-
 #endif
