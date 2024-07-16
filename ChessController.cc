@@ -105,14 +105,16 @@ void ChessController::input_loop() {
                   << ". Please try again.\n";
       }
 
-      if (p1_good && p2_good) game_loop();
-    } else if (command == "setup") {
-      // TODO handle setup
-      std::cout << "Not implemented\n";
-      exit(1);
-    } else {
-      std::cout << "Invalid command: " << command << ". Please try again. \n";
-    }
+
+    if (p1_good && p2_good) game_loop();
+  } else if (command == "setup") {
+    setup_loop();
+    //setup_loop
+    std::cout << "Not implemented\n";
+    exit(1);
+  } else {
+    std::cout << "Invalid command: " << command << ". Please try again. \n";
+
   }
 }
 
@@ -162,4 +164,8 @@ void ChessController::game_loop() {
     } else {
     }
   }
+}
+
+void ChessController::setup_loop() {
+  model->setup_start();
 }
