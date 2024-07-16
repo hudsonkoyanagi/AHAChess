@@ -8,7 +8,7 @@
 #include "Enums.h"
 #include "Piece.h"
 #include "Move.h"
-#include "ChessTextView.h"
+#include "ChessView.h"
 
 class ChessModel {
 private:
@@ -25,13 +25,13 @@ private:
 
     Cord pawn_to_promote;
 
-    ChessTextView* view;
+    ChessView* view;
 
     
     
 
 public:
-    ChessModel(ChessTextView* v);
+    ChessModel(ChessView* v);
     ~ChessModel();
 
     void reset();
