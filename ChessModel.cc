@@ -34,6 +34,9 @@ ChessModel::ChessModel(ChessTextView* v) : view{v}, pawn_to_promote{-1,-1} {
   board[7][5] = new Piece{'B', Cord{7, 5}, WHITE, BISHOP};
   board[7][6] = new Piece{'N', Cord{7, 6}, WHITE, KNIGHT};
   board[7][7] = new Piece{'R', Cord{7, 7}, WHITE, ROOK};
+
+  view->init_board(board);
+  view->render();
 }
 
 ChessModel::~ChessModel() {

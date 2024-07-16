@@ -5,11 +5,11 @@
 class Piece;
 
 class ChessView {
-private:
+protected:
     std::array<std::array<char, 8>, 8> board;
 public: 
-    void init_board(std::array<std::array<Piece*, 8>, 8> b); // sets the state of the whole board
-    void update(Piece* a, int xa, int ya, Piece* b, int xb, int yb); // Updates on a move - only two tiles may change
+    void init_board(const std::array<std::array<Piece*, 8>, 8>& b); // sets the state of the whole board
+    void update(Piece* a, Piece* b); // Updates on a move - only two tiles may change and pieces contain their location
     virtual void render() = 0;
 };
 
