@@ -10,6 +10,7 @@ private:
     int side_length; // should probably be 0 mod 8
  public:
   void render();
+  void update(Piece* a, Piece* b);
 };
 
 #endif

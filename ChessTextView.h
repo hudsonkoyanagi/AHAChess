@@ -5,6 +5,7 @@
 class ChessTextView : public ChessView {
 public:
     void render();
+    void update(Piece* a, Piece* b);
 };
 
 #endif
