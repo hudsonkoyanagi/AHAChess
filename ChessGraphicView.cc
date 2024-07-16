@@ -1,8 +1,7 @@
 #include "ChessGraphicView.h"
 #include <iostream>
 
-void ChessGraphicView::render() {
-  Xwindow win{side_length, side_length};
+ChessGraphicView::ChessGraphicView(int size): side_length{size}, tile_length{size/8}, win{size, size} {
   std::string s;
   for (int r=0;r<8;++r) {
     for (int c=0;c<8;++c) {
@@ -19,4 +18,8 @@ void ChessGraphicView::render() {
       }
     }
   }
+}
+
+void ChessGraphicView::render() {
+  
 }

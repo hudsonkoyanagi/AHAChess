@@ -5,13 +5,12 @@
 #include "window.h"
 
 class ChessGraphicView : public ChessView {
-private:
-    Xwindow* win;
-
-    const int side_length = 800;  // should probably be 0 mod 8
-    const int tile_length = side_length / 8;
-
-   public:
+  private:
+    Xwindow win;
+    const int side_length; // should probably be 0 mod 8
+    const int tile_length;
+  public:
+    ChessGraphicView(int size = 800);
     void render();
     void update(Piece* a, Piece* b);
 };
