@@ -27,13 +27,15 @@ private:
 
     ChessTextView* view;
 
-    void reset();
-    void empty();
+    
+    
 
 public:
     ChessModel(ChessTextView* v);
     ~ChessModel();
 
+    void reset();
+    void empty();
 
     MOVE_RESULTS make_move(Move m);
 
