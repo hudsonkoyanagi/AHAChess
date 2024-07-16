@@ -7,7 +7,7 @@ class Level3 : public ComputerPlayer {
  private:
   // smart algo things
  public:
-  Move get_move();
+  Move make_move();
 };
 
 #endif

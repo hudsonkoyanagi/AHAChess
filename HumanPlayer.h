@@ -6,7 +6,7 @@
 
 class HumanPlayer : public Player {
 public:
-    Move get_move();
+    Move make_move();
 };
 
 #endif
