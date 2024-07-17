@@ -4,7 +4,7 @@
 #include "Piece.h"
 
 // Inits to starting board
-ChessModel::ChessModel(ChessView* v) : view{v}, pawn_to_promote{-1,-1} {
+ChessModel::ChessModel() : pawn_to_promote{-1,-1} {
   board[0][0] = new Piece{'r', Cord{0,0}, BLACK, ROOK};
   board[0][1] = new Piece{'n', Cord{0,1}, BLACK, KNIGHT};
   board[0][2] = new Piece{'b', Cord{0,2}, BLACK, BISHOP};
@@ -34,9 +34,6 @@ ChessModel::ChessModel(ChessView* v) : view{v}, pawn_to_promote{-1,-1} {
   board[7][5] = new Piece{'B', Cord{7, 5}, WHITE, BISHOP};
   board[7][6] = new Piece{'N', Cord{7, 6}, WHITE, KNIGHT};
   board[7][7] = new Piece{'R', Cord{7, 7}, WHITE, ROOK};
-
-  view->init_board(board);
-  view->render();
 }
 
 ChessModel::~ChessModel() {
@@ -45,13 +42,23 @@ ChessModel::~ChessModel() {
       delete board[i][j];
     }
   }
+  for(auto p : views) delete p;
 }
 
 
-
-
 void ChessModel::setup_start(){}
+
+void ChessModel::notify_views() {
+  for(auto v : views) {
+    v->render();
+  }
+}
   
+void ChessModel::register_view(ChessView* v) { 
+  v->init_board(board);
+  v->render();
+  views.push_back(v);
+}
 
 MOVE_RESULTS ChessModel::make_move(Move m) {
   return SUCCESS;

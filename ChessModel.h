@@ -16,6 +16,7 @@ private:
     std::vector<Move> history;
     std::array<char, 8> white_pieces;
     std::array<char, 8> black_pieces;
+    std::vector<ChessView*> views;
 
 
     bool white_in_check = false;
@@ -24,14 +25,8 @@ private:
     bool black_in_mate = false;
 
     Cord pawn_to_promote;
-
-    ChessView* view;
-
-    
-    
-
 public:
-    ChessModel(ChessView* v);
+    ChessModel();
     ~ChessModel();
 
     void reset();
@@ -44,6 +39,11 @@ public:
     void setup_rem_piece(Cord move);
     void setup_set_turn(COLOURS col);
     bool setup_finish(); // returns false if setup cannot be finished (invalid pawns, kings, etc)
+
+
+    void notify_views();
+
+    void register_view(ChessView* v);
 
     // friend std::istream& operator>>(std::istream& is, ChessModel& b);
     // friend std::ostream& operator<<(std::ostream& os, const ChessModel& b);

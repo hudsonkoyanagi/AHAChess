@@ -1,5 +1,6 @@
 #include "ChessTextView.h"
 #include <iostream>
+#include "Piece.h"
 
 void ChessTextView::render() {
   std::cout << "- +-------------------------------+" << std::endl;
