@@ -7,10 +7,16 @@ class Piece;
 class ChessView {
 protected:
     std::array<std::array<char, 8>, 8> board;
-public: 
-    void init_board(const std::array<std::array<Piece*, 8>, 8>& b); // sets the state of the whole board
-    virtual void update(Piece* a, Piece* b) = 0; // Updates on a move - only two tiles may change and pieces contain their location
-    virtual void render() = 0;
+public:
+ // sets the state of the whole board
+ void init_board(const std::array<std::array<Piece*, 8>, 8>& b);
+
+ // renders based on internal state only
+ virtual void render() = 0;
+ // renders after a single move
+ virtual void render(Piece* a, Piece* b) = 0;
+ // renders an entire new board state
+ virtual void render(const std::array<std::array<Piece*, 8>, 8>& b) = 0;
 };
 
 #endif

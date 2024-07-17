@@ -20,6 +20,8 @@ ChessGraphicView::ChessGraphicView(int size): side_length{size}, tile_length{siz
   }
 }
 
-void ChessGraphicView::render() {
-  
-}
+void ChessGraphicView::render() {}
+
+void ChessGraphicView::render(Piece* a, Piece* b) {}
+
+void ChessGraphicView::render(const std::array<std::array<Piece*, 8>, 8>& b) {}

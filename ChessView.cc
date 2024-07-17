@@ -10,8 +10,3 @@ void ChessView::init_board(const std::array<std::array<Piece*, 8>, 8>& b) {
         }
     }
 }
-
-void ChessView::update(Piece* a, Piece* b) {
-    board[a->loc.row][a->loc.col] = a->letter;
-    board[b->loc.row][b->loc.col] = b->letter;
-}

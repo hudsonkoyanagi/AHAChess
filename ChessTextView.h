@@ -4,8 +4,13 @@
 
 class ChessTextView : public ChessView {
 public:
+
+    // renders based on internal state only
     void render();
-    void update(Piece* a, Piece* b);
+    // renders after a single move
+    void render(Piece* a, Piece* b);  
+    // renders an entire new board state
+    void render(const std::array<std::array<Piece*, 8>, 8>& b);  
 };
 
 #endif

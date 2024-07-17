@@ -14,7 +14,13 @@ void ChessTextView::render() {
   std::cout << "  | a | b | c | d | e | f | g | h |" << std::endl << std::endl;
 }
 
-void ChessTextView::update(Piece* a, Piece* b) {
+void ChessTextView::render(Piece* a, Piece* b) {
   board[a->loc.row][a->loc.col] = a->letter;
   board[b->loc.row][b->loc.col] = b->letter;
+  this->render();
+}
+
+void ChessTextView::render(const std::array<std::array<Piece*, 8>, 8>& b) {
+  this->init_board(b);
+  this->render();
 }
