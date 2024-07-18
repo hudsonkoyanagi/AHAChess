@@ -84,6 +84,7 @@ MOVE_RESULTS ChessModel::make_move(Move m) {
         // TODO: different capture logic? CHECK FOR CHECKS?
         target->type = EMPTY;
         target->col = NONE;
+        target->letter = ' ';
         std::swap(target->loc, p->loc);
         std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
         p->has_moved = true;
@@ -93,7 +94,6 @@ MOVE_RESULTS ChessModel::make_move(Move m) {
         notify_views();
         return CAPTURE;
       }
-
       if (abs(m.start.row - m.end.row) == 2) { // starting square 
         if ((p->col == WHITE) && (m.start.row != 6) && (m.end.row != 4)) return INVALID_MOVE; // only way to move forward two
         if ((p->col == BLACK) && (m.start.row != 1) && (m.end.row != 3)) return INVALID_MOVE; // only way to move forward two
@@ -105,7 +105,10 @@ MOVE_RESULTS ChessModel::make_move(Move m) {
         std::swap(target->loc, p->loc);
         std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
         p->has_moved = true;
-        notify_views();
+        std::cout << "I AM HERE\n";
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
         return SUCCESS;
       }
 
