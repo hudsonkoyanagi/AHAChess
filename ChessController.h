@@ -11,8 +11,8 @@ private:
 
     bool white_to_move = true;
 
-    Player* p1; // nullptr if human player
-    Player* p2; // nullptr if human player
+    Player* p1 = nullptr; // nullptr if human player
+    Player* p2 = nullptr; // nullptr if human player
 public:
     void input_loop();
     void game_loop();

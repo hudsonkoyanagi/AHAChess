@@ -5,12 +5,12 @@
 
 int main() {
     ChessTextView *tv = new ChessTextView{};
-    ChessGraphicView *view = new ChessGraphicView{400};
-    ChessGraphicView *view2 = new ChessGraphicView{};
+    // ChessGraphicView *view = new ChessGraphicView{400};
+    // ChessGraphicView *view2 = new ChessGraphicView{};
     ChessModel model;
     model.register_view(tv);
-    model.register_view(view);
-    model.register_view(view2);
+    // model.register_view(view);
+    // model.register_view(view2);
 
     ChessController controller{&model};
 

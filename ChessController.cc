@@ -30,6 +30,10 @@ void ChessController::input_loop() {
   std::string second;
   std::string third;
 
+  std::cout << "Current score: \n";
+  std::cout << "White: " << white_wins << std::endl;
+  std::cout << "Black: " << black_wins << std::endl;
+
   while (std::cin >> command) {
     bool p1_good = false;
     bool p2_good = false;
@@ -118,6 +122,7 @@ void ChessController::input_loop() {
 }
 
 void ChessController::game_loop() {
+  std::cout << "Game beginning, white to move\n";
   std::string command;
   std::string start, end;
   while (std::cin >> command) {
@@ -153,6 +158,9 @@ void ChessController::game_loop() {
           break;
         case WHITE_IN_CHECK:
           std::cout << "White is in check.\n";
+          break;
+        case CAPTURE:
+          std::cout << "DEBUG: captured\n";
           break;
         case SUCCESS:
           std::cout << "DEBUG: made move\n";
