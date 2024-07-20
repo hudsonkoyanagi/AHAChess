@@ -135,7 +135,7 @@ void ChessController::game_loop() {
       }
 
       MOVE_RESULTS res =
-          model->make_move(Move{str_to_cord(start), str_to_cord(end)});
+          model->make_move(Move{str_to_cord(start), str_to_cord(end)}, white_to_move);
       switch (res) {
         case INVALID_MOVE:
           std::cout << "Invalid move played, try again\n";
@@ -155,15 +155,19 @@ void ChessController::game_loop() {
           return;
         case BLACK_IN_CHECK:
           std::cout << "Black is in check.\n";
+          white_to_move = !white_to_move;
           break;
         case WHITE_IN_CHECK:
           std::cout << "White is in check.\n";
+          white_to_move = !white_to_move;
           break;
         case CAPTURE:
           std::cout << "DEBUG: captured\n";
+          white_to_move = !white_to_move;
           break;
         case SUCCESS:
           std::cout << "DEBUG: made move\n";
+          white_to_move = !white_to_move;
         default:
           break;
       }

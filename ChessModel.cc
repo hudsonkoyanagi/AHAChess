@@ -65,61 +65,77 @@ void ChessModel::register_view(ChessView* v) {
 
 
 // Start and end are both coordinates within the board
-MOVE_RESULTS ChessModel::make_move(Move m) {
+MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   Piece* p = board[m.start.row][m.start.col];
   Piece* target = board[m.end.row][m.end.col];
+  if ((p->col == WHITE && !white_to_move) || (p->col == BLACK && white_to_move)) return INVALID_MOVE;
   switch (p->type) {
-    case PAWN:
-      if (m.start.col != m.end.col) { // capture/en pesant
-        if (abs(m.start.row - m.end.row) != 1) return INVALID_MOVE; // move one forward
-        if (abs(m.start.col - m.end.col) != 1) return INVALID_MOVE; // move one sideways
-        if ((p->col == WHITE) && (m.start.row <= m.end.row)) return INVALID_MOVE; // backwards move
-        if ((p->col == BLACK) && (m.start.row >= m.end.row)) return INVALID_MOVE; // backwards move
+  case PAWN:
+    if (m.start.col != m.end.col) { // capture/en pesant
+      if (abs(m.start.row - m.end.row) != 1) return INVALID_MOVE; // move one forward
+      if (abs(m.start.col - m.end.col) != 1) return INVALID_MOVE; // move one sideways
+      if ((p->col == WHITE) && (m.start.row <= m.end.row)) return INVALID_MOVE; // backwards move
+      if ((p->col == BLACK) && (m.start.row >= m.end.row)) return INVALID_MOVE; // backwards move
 
 
-        if (target->type == EMPTY) return INVALID_MOVE; // no piece TODO: EN PASSANT
-        if (target->col == p->col) return INVALID_MOVE; // same colour capture
-        if (target->type == KING) return INVALID_MOVE; // can't capture king (TODO game should be over here anyway)
+      if (target->type == EMPTY) return INVALID_MOVE; // no piece TODO: EN PASSANT
+      if (target->col == p->col) return INVALID_MOVE; // same colour capture
+      if (target->type == KING) return INVALID_MOVE; // can't capture king (TODO game should be over here anyway)
 
-        // TODO: different capture logic? CHECK FOR CHECKS?
-        target->type = EMPTY;
-        target->col = NONE;
-        target->letter = ' ';
-        std::swap(target->loc, p->loc);
-        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-        p->has_moved = true;
-        for(auto v : views) {
-          v->render(board); // TODO FIX THIS LATER
-        }
-        notify_views();
-        return CAPTURE;
+      // TODO: different capture logic? CHECK FOR CHECKS?
+      target->set_empty();
+
+      // Should be standard for most moves
+      // TODO: can move to other function
+      std::swap(target->loc, p->loc);
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      history.push_back(m);
+      p->has_moved = true;
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
       }
-      if (abs(m.start.row - m.end.row) == 2) { // starting square 
-        if ((p->col == WHITE) && (m.start.row != 6) && (m.end.row != 4)) return INVALID_MOVE; // only way to move forward two
-        if ((p->col == BLACK) && (m.start.row != 1) && (m.end.row != 3)) return INVALID_MOVE; // only way to move forward two
+      // notify_views();
+      return CAPTURE;
+    }
+    if (abs(m.start.row - m.end.row) == 2) { // starting square 
+      if ((p->col == WHITE) && (m.start.row != 6) && (m.end.row != 4)) return INVALID_MOVE; // only way to move forward two
+      if ((p->col == BLACK) && (m.start.row != 1) && (m.end.row != 3)) return INVALID_MOVE; // only way to move forward two
 
-        if (target->type != EMPTY) return INVALID_MOVE; // blocked
-        if ((p->col == WHITE) && (board[5][m.start.col]->type != EMPTY)) return INVALID_MOVE; // blocked
-        if ((p->col == BLACK) && (board[2][m.start.col]->type != EMPTY)) return INVALID_MOVE; // blocked
+      if (target->type != EMPTY) return INVALID_MOVE; // blocked
+      if ((p->col == WHITE) && (board[5][m.start.col]->type != EMPTY)) return INVALID_MOVE; // blocked
+      if ((p->col == BLACK) && (board[2][m.start.col]->type != EMPTY)) return INVALID_MOVE; // blocked
 
-        std::swap(target->loc, p->loc);
-        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-        p->has_moved = true;
-        std::cout << "I AM HERE\n";
-        for (auto v : views) {
-          v->render(board); // TODO FIX THIS LATER
-        }
-        return SUCCESS;
+      std::swap(target->loc, p->loc); // update piece location
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+      p->has_moved = true;
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
       }
+      // notify_views();
+      return SUCCESS;
+    }
 
-      if (abs(m.start.row - m.end.row) == 1) { // forward move, possibly promotion
+    if (abs(m.start.row - m.end.row) == 1) { // forward move, possibly promotion
+      if ((p->col == WHITE) && (m.start.row <= m.end.row)) return INVALID_MOVE;
+      if ((p->col == BLACK) && (m.start.row >= m.end.row)) return INVALID_MOVE;
+      if(target->type != EMPTY) return INVALID_MOVE;
+     
+      // TODO: HANDLE PROMOTION HERE
 
+      std::swap(target->loc, p->loc); // update piece location
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+      p->has_moved = true;
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
       }
+      // notify_views();
+      return SUCCESS;
+    }
 
-      return INVALID_MOVE;
-    default:
-      std::cout << "Not implemented yet, ignoring move";
-      return INVALID_MOVE;
+    return INVALID_MOVE;
+  default:
+    std::cout << "Not implemented yet, ignoring move";
+    return INVALID_MOVE;
   }
   return SUCCESS;
 }

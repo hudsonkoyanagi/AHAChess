@@ -32,7 +32,7 @@ public:
     void reset();
     void empty();
 
-    MOVE_RESULTS make_move(Move m);
+    MOVE_RESULTS make_move(Move m, bool white_to_move);
 
     void setup_start(); // empties board
     void setup_add_piece(char piece, Cord move);
