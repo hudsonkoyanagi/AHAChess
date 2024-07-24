@@ -133,6 +133,278 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
     }
 
     return INVALID_MOVE;
+  case KING:
+    // if moving in a direction not 1 or 0, then invalid
+    if (!(abs(m.end.row - m.start.row) <= 1 && abs(m.end.col - m.start.col) <= 1)) return INVALID_MOVE;
+
+    // check for if the space is empty
+    if (!(target->type == EMPTY)) {
+      // can't capture own piece
+      if (target->col == p->col) return INVALID_MOVE;
+
+      target->set_empty();
+
+      std::swap(target->loc, p->loc);
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+
+      history.push_back(m);
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return CAPTURE;
+    }
+    else {
+      std::swap(target->loc, p->loc); // update piece location
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+      history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return SUCCESS;
+    }
+  case KNIGHT:
+    // either the row differs by 1 and the col differs by 2, or the row differs by 2 and the col differs by 1
+    if (!((abs(m.end.row - m.start.row) == 1 && abs(m.end.col - m.start.col) == 2) || abs(m.end.row - m.start.row) == 2 && abs(m.end.col - m.start.col) == 1)) return INVALID_MOVE;
+
+    // check for if the space is empty
+    if (!(target->type == EMPTY)) {
+      // can't capture own piece
+      if (target->col == p->col) return INVALID_MOVE;
+
+      target->set_empty();
+
+      std::swap(target->loc, p->loc);
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+
+      history.push_back(m);
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return CAPTURE;
+    }
+    else {
+      std::swap(target->loc, p->loc); // update piece location
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+      history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return SUCCESS;
+    }
+  case BISHOP:
+  {
+    // if the change in row is not the same as the change in col, then it is invalid
+    if (!(abs(m.end.row - m.start.row) == abs(m.end.col - m.start.col))) return INVALID_MOVE;
+
+    // check if target is same colour
+    if (target->col == p->col) return INVALID_MOVE;
+
+    // check if the path to that spot is clear
+    int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+    int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+    int curr_row = m.start.row + row_inc;
+    int curr_col = m.start.col + col_inc;
+    while (curr_row != m.end.row) {
+      // if there is anything between them, it is an invalid move
+      if (board[curr_row][curr_col]->type != EMPTY) return INVALID_MOVE;
+      curr_row += row_inc;
+      curr_col += col_inc;
+    }
+
+    if (target->type != EMPTY) {
+      target->set_empty();
+
+      std::swap(target->loc, p->loc);
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      history.push_back(m);
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return CAPTURE;
+    }
+    else {
+      std::swap(target->loc, p->loc); // update piece location
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+      history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return SUCCESS;
+    }
+  }
+  case ROOK:
+  {
+    // if both the row and the col don't remain the same it is invalid
+    if (!(m.start.row == m.end.row || m.start.col == m.end.col)) return INVALID_MOVE;
+
+    // check if target is same colour
+    if (target->col == p->col) return INVALID_MOVE;
+
+    // check if the path to that spot is clear
+    if (m.start.row == m.end.row) {
+      // if the row stays the same, it moves along the column
+      int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+      int curr_col = m.start.col + col_inc;
+      while (curr_col != m.end.col) {
+        // if there is anything between them, it is an invalid move
+        if (board[m.start.row][curr_col]->type != EMPTY) return INVALID_MOVE;
+        curr_col += col_inc;
+      }
+    }
+    else {
+      // otherwise, it moves along the row
+      int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+      int curr_row = m.start.row + row_inc;
+      while (curr_row != m.end.row) {
+        // if there is anything between them, it is an invalid move
+        if (board[curr_row][m.start.col]->type != EMPTY) return INVALID_MOVE;
+        curr_row += row_inc;
+      }
+    }
+
+    if (target->type != EMPTY) {
+      target->set_empty();
+
+      std::swap(target->loc, p->loc);
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      history.push_back(m);
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return CAPTURE;
+    }
+    else {
+      std::swap(target->loc, p->loc); // update piece location
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+      history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+      for (auto v : views) {
+        v->render(board); // TODO FIX THIS LATER
+      }
+      // notify_views();
+      return SUCCESS;
+    }
+  }
+  case QUEEN:
+  {
+    // bishop logic
+    if (abs(m.end.row - m.start.row) == abs(m.end.col - m.start.col)) {
+      // check if target is same colour
+      if (target->col == p->col) return INVALID_MOVE;
+
+      // check if the path to that spot is clear
+      int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+      int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+      int curr_row = m.start.row + row_inc;
+      int curr_col = m.start.col + col_inc;
+      while (curr_row != m.end.row) {
+        // if there is anything between them, it is an invalid move
+        if (board[curr_row][curr_col]->type != EMPTY) return INVALID_MOVE;
+        curr_row += row_inc;
+        curr_col += col_inc;
+      }
+
+      if (target->type != EMPTY) {
+        target->set_empty();
+
+        std::swap(target->loc, p->loc);
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+        history.push_back(m);
+
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
+        // notify_views();
+        return CAPTURE;
+      }
+      else {
+        std::swap(target->loc, p->loc); // update piece location
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+        history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
+        // notify_views();
+        return SUCCESS;
+      }
+    }
+    // rook logic
+    else if (m.start.row == m.end.row || m.start.col == m.end.col) {
+      // check if target is same colour
+      if (target->col == p->col) return INVALID_MOVE;
+
+      // check if the path to that spot is clear
+      if (m.start.row == m.end.row) {
+        // if the row stays the same, it moves along the column
+        int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+        int curr_col = m.start.col + col_inc;
+        while (curr_col != m.end.col) {
+          // if there is anything between them, it is an invalid move
+          if (board[m.start.row][curr_col]->type != EMPTY) return INVALID_MOVE;
+          curr_col += col_inc;
+        }
+      }
+      else {
+        // otherwise, it moves along the row
+        int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+        int curr_row = m.start.row + row_inc;
+        while (curr_row != m.end.row) {
+          // if there is anything between them, it is an invalid move
+          if (board[curr_row][m.start.col]->type != EMPTY) return INVALID_MOVE;
+          curr_row += row_inc;
+        }
+      }
+
+      if (target->type != EMPTY) {
+        target->set_empty();
+
+        std::swap(target->loc, p->loc);
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+        history.push_back(m);
+
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
+        // notify_views();
+        return CAPTURE;
+      }
+      else {
+        std::swap(target->loc, p->loc); // update piece location
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+        history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
+        // notify_views();
+        return SUCCESS;
+      }
+    }
+    else {
+      return INVALID_MOVE;
+    }
+  }
   default:
     std::cout << "Not implemented yet, ignoring move";
     return INVALID_MOVE;
