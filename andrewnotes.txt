@@ -22,6 +22,12 @@
       return SUCCESS;
   are repetitive. can probably turn this into a function.
 
+- please fix check condition, not sure if right!
+- add an if condition for a check if you attempt to move a moven piece
+- add an if condition for a check if you attempt to castle
+- do we return castle (new enum)?
+
+- NEED: add history to each case
 
 quick copy paste for a run:
 

@@ -134,38 +134,75 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
 
     return INVALID_MOVE;
   case KING:
-    // if moving in a direction not 1 or 0, then invalid
-    if (!(abs(m.end.row - m.start.row) <= 1 && abs(m.end.col - m.start.col) <= 1)) return INVALID_MOVE;
+    // if moving 2 columnwise, then must be a castle
+    if (abs(m.end.row - m.start.row) == 0 && abs(m.end.col - m.start.col) == 2) {
+      // check for no initial moves on rook and king
 
-    // check for if the space is empty
-    if (!(target->type == EMPTY)) {
-      // can't capture own piece
-      if (target->col == p->col) return INVALID_MOVE;
+      // check for no check
 
-      target->set_empty();
+      // cases both ways
+      if (m.end.col == 6) {
+        // if the inbetween are not empty, it is an invalid move
+        if (!(board[m.start.row][5]->type == EMPTY && board[m.start.row][6]->type == EMPTY)) return INVALID_MOVE;
 
-      std::swap(target->loc, p->loc);
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+        std::swap(target->loc, p->loc);
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
 
-      history.push_back(m);
-
-      for (auto v : views) {
-        v->render(board); // TODO FIX THIS LATER
+        std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
+        std::swap(board[m.start.row][5], board[m.start.row][7]);
       }
-      // notify_views();
-      return CAPTURE;
-    }
-    else {
-      std::swap(target->loc, p->loc); // update piece location
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+      if (m.end.col == 2) {
+        // if the inbetween are not empty, it is an invalid move
+        if (!(board[m.start.row][1]->type == EMPTY && board[m.start.row][2]->type == EMPTY && board[m.start.row][3]->type == EMPTY)) return INVALID_MOVE;
 
-      history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+        std::swap(target->loc, p->loc);
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+
+        std::swap(board[m.start.row][3]->loc, board[m.start.row][0]->loc);
+        std::swap(board[m.start.row][3], board[m.start.row][0]);
+      }
 
       for (auto v : views) {
         v->render(board); // TODO FIX THIS LATER
       }
       // notify_views();
       return SUCCESS;
+    }
+    // if moving in a direction not 1 or 0, then invalid
+    else if (abs(m.end.row - m.start.row) <= 1 && abs(m.end.col - m.start.col) <= 1) {
+      // check for if the space is empty
+      if (!(target->type == EMPTY)) {
+        // can't capture own piece
+        if (target->col == p->col) return INVALID_MOVE;
+
+        target->set_empty();
+
+        std::swap(target->loc, p->loc);
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+
+        history.push_back(m);
+
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
+        // notify_views();
+        return CAPTURE;
+      }
+      else {
+        std::swap(target->loc, p->loc); // update piece location
+        std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
+        history.push_back(m); // is this necessary? I think it should be, check andrewnotes for what I think about history
+
+        for (auto v : views) {
+          v->render(board); // TODO FIX THIS LATER
+        }
+        // notify_views();
+        return SUCCESS;
+      }
+    }
+    else {
+      return INVALID_MOVE;
     }
   case KNIGHT:
     // either the row differs by 1 and the col differs by 2, or the row differs by 2 and the col differs by 1
