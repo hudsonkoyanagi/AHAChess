@@ -32,7 +32,8 @@ public:
 
     void reset();
     void empty();
-
+    
+    MOVE_RESULTS is_valid(Move m, bool white_to_move);
     MOVE_RESULTS make_move(Move m, bool white_to_move);
     void do_move(Move m);       // Actually updates board state
     void do_capture(Move m);    // Updates board and erases piece at m.end

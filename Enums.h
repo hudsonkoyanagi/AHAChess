@@ -18,6 +18,7 @@ enum MOVE_RESULTS {
     CAPTURE,
     PROMOTION,
     CASTLE,
+    EN_PASSANT
 };
 
 enum PIECES {

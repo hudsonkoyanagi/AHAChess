@@ -14,6 +14,8 @@ struct Piece {
     Piece(char l, Cord c, COLOURS col, PIECES t, bool b =false);
     void set_empty();
     bool is_empty();
+
+    int start_row(); // returns the INDEX of its starting point
 };
 
 #endif

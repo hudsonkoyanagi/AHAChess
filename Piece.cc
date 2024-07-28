@@ -11,3 +11,17 @@ void Piece::set_empty() {
 bool Piece::is_empty() {
     return type == EMPTY && col == NONE && letter == ' ';
 }
+
+int Piece::start_row() {
+    if(this->is_empty()) return -1;
+
+    if(col == WHITE) {
+        if(type == PAWN) return 6;
+        else return 7;
+    }
+
+    if (type == PAWN) return 1;
+    else return 0;
+
+
+}
