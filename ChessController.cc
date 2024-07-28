@@ -1,24 +1,11 @@
-#include "ChessController.h"
-
 #include <iostream>
 #include <string>
 
+#include "ChessController.h"
 #include "ChessModel.h"
 #include "Player.h"
+#include "utils.h"
 
-bool is_valid_cord(const std::string& str) {
-  return ((str.length() == 2) && ('a' <= str[0] && str[0] <= 'h') &&
-          ('1' <= str[1] && str[1] <= '8'));
-}
-
-// Invalid cord is returned as <-1,-1>
-// Returns row, col indexes in board from a chess cord string
-Cord str_to_cord(const std::string& str) {
-  if (!is_valid_cord(str)) return Cord{-1, -1};
-  int row = 7 - (str[1] - '0' - 1);
-  int col = str[0] - 'a';  // converts 'a'-'h' to index
-  return Cord{row, col};
-}
 
 bool is_valid_computer(const std::string& s) {
   return s.length() == 9 && s.substr(0, 7) == "computer" && '1' <= s[8] &&

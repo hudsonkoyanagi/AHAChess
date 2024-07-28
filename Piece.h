@@ -13,6 +13,7 @@ struct Piece {
 
     Piece(char l, Cord c, COLOURS col, PIECES t, bool b =false);
     void set_empty();
+    bool is_empty();
 };
 
 #endif

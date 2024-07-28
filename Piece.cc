@@ -7,3 +7,7 @@ void Piece::set_empty() {
     col = NONE;
     letter = ' ';
 }
+
+bool Piece::is_empty() {
+    return type == EMPTY && col == NONE && letter == ' ';
+}

@@ -10,6 +10,7 @@
 #include "Move.h"
 #include "ChessView.h"
 
+
 class ChessModel {
 private:
     std::array<std::array<Piece*, 8>, 8> board;
@@ -33,12 +34,17 @@ public:
     void empty();
 
     MOVE_RESULTS make_move(Move m, bool white_to_move);
+    void do_move(Move m);       // Actually updates board state
+    void do_capture(Move m);    // Updates board and erases piece at m.end
 
     void setup_start(); // empties board
     void setup_add_piece(char piece, Cord move);
     void setup_rem_piece(Cord move);
     void setup_set_turn(COLOURS col);
     bool setup_finish(); // returns false if setup cannot be finished (invalid pawns, kings, etc)
+
+
+    Piece* at(std::string s); // returns piece at cord string or nullptr if invalid
 
 
     void notify_views();
