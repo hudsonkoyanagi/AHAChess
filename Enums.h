@@ -15,7 +15,9 @@ enum MOVE_RESULTS {
     SUCCESS,
     INVALID_MOVE, 
     STALEMATE,
-    CAPTURE
+    CAPTURE,
+    PROMOTION,
+    CASTLE,
 };
 
 enum PIECES {

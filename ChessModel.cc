@@ -71,7 +71,7 @@ void ChessModel::do_move(Move m) {
   history.push_back(m);
   p->has_moved = true;
   for (auto v : views) {
-    v->render(board); // TODO FIX THIS LATER
+    v->render(board); // TODO FIX RENDERING
   }
 }
 
@@ -146,9 +146,7 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   case KING:
     // if moving 2 columnwise, then must be a castle
     if (abs(m.end.row - m.start.row) == 0 && abs(m.end.col - m.start.col) == 2) {
-
       if (p->has_moved) return INVALID_MOVE; // king can't have moved
-
 
       Piece* should_be_rook;
       int row = 0; // chess notation row not index
@@ -166,8 +164,6 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
       if (should_be_rook->type != ROOK) return INVALID_MOVE;
       if (should_be_rook->has_moved)    return INVALID_MOVE;
 
-
-
       if (m.start.col > m.start.col) { // Queen side castle
         if (!(at("b" + row)->is_empty()) || !(at("c" + row)->is_empty()) || !(at("d" + row)->is_empty())) return INVALID_MOVE;
         do_move(m); // move the king
@@ -180,8 +176,7 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
         std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
         std::swap(board[m.start.row][5], board[m.start.row][7]);
       }
-
-      return SUCCESS;
+      return CASTLE;
     }
 
     // if moving in a direction not 1 or 0, then invalid
