@@ -150,35 +150,37 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
       if (p->has_moved) return INVALID_MOVE; // king can't have moved
 
 
-      if (p->col == WHITE) {
-        if (m.start.col > m.start.col) { // Queen side castle
-          Piece* should_be_rook = this->at("a1");
-          if (should_be_rook->col != WHITE) return INVALID_MOVE;
-          if (should_be_rook->type != ROOK) return INVALID_MOVE;
-          if (should_be_rook->has_moved)    return INVALID_MOVE;
-          if (!(at("b1")->is_empty()) || !(at("c1")->is_empty()) || !(at("d1")->is_empty())) return INVALID_MOVE;
-
-          do_move(m);
-          std::swap(board[m.start.row][3]->loc, board[m.start.row][0]->loc);
-          std::swap(board[m.start.row][3], board[m.start.row][0]);
-
-
-
-
-
-        } else { // King side castle
-          Piece* should_be_rook = this->at("h1");
-          if (should_be_rook->col != WHITE) return INVALID_MOVE;
-          if (should_be_rook->type != ROOK) return INVALID_MOVE;
-          if (should_be_rook->has_moved)    return INVALID_MOVE;
-          if (!(at("f1")->is_empty()) || !(at("g1")->is_empty())) return INVALID_MOVE;
-
-          do_move(m);
-          std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
-          std::swap(board[m.start.row][5], board[m.start.row][7]);
-
-        }
+      Piece* should_be_rook;
+      int row = 0; // chess notation row not index
+      if(p->col == WHITE) {
+        row = 1;
+        if (m.start.col > m.start.col) should_be_rook = at("a1");
+        if (m.start.col < m.start.col) should_be_rook = at("h1");
+      } else { // BLACK
+        row = 8;
+        if (m.start.col > m.start.col) should_be_rook = at("a8");
+        if (m.start.col < m.start.col) should_be_rook = at("h8");
       }
+
+      if (should_be_rook->col != p->col) return INVALID_MOVE;
+      if (should_be_rook->type != ROOK) return INVALID_MOVE;
+      if (should_be_rook->has_moved)    return INVALID_MOVE;
+
+
+
+      if (m.start.col > m.start.col) { // Queen side castle
+        if (!(at("b" + row)->is_empty()) || !(at("c" + row)->is_empty()) || !(at("d" + row)->is_empty())) return INVALID_MOVE;
+        do_move(m); // move the king
+        std::swap(board[m.start.row][3]->loc, board[m.start.row][0]->loc);
+        std::swap(board[m.start.row][3], board[m.start.row][0]);
+
+      } else { // King side castle
+        if (!(at("f" + row)->is_empty()) || !(at("g" + row)->is_empty())) return INVALID_MOVE;
+        do_move(m); // move the king
+        std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
+        std::swap(board[m.start.row][5], board[m.start.row][7]);
+      }
+
       return SUCCESS;
     }
 
