@@ -67,3 +67,18 @@ void printPiece(PIECES piece) {
     std::cout << std::endl;
 }
 
+char piece_col_to_char(PIECES p, COLOURS c) {
+    char ch;
+
+    if(p==KING) ch = 'k';
+    else if(p==QUEEN) ch='q';
+    else if (p == ROOK) ch = 'r';
+    else if (p == BISHOP) ch = 'b';
+    else if (p == KNIGHT) ch = 'n';
+    else if (p == PAWN) ch = 'p';
+    else if (p == EMPTY) ch = ' ';
+
+    if(p != EMPTY && c == WHITE) ch -= 32;
+    return ch;
+
+}
