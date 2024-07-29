@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "ChessModel.h"
 
-class ComputerPlayer {
+class ComputerPlayer : public Player {
 protected:
     ChessModel* model;
 public:

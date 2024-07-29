@@ -5,6 +5,7 @@
 #include "ChessModel.h"
 #include "Player.h"
 #include "utils.h"
+#include "Level1.h"
 
 
 bool is_valid_computer(const std::string& s) {
@@ -72,7 +73,7 @@ void ChessController::input_loop() {
         p2_good = true;
         switch (third[8]) {
           case '1':
-            // p2 = new Level1{model};
+            p2 = new Level1{model};
             p1 = nullptr;
             break;
           case '2':

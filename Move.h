@@ -1,6 +1,7 @@
 #ifndef MOVE_H
 #define MOVE_H
 #include "Cord.h"
+#include "Enums.h"
 
 class Move {
     public:
@@ -16,6 +17,7 @@ class Move {
     bool check = false;
     
     Move(Cord s, Cord e);
+    Move(int sr, int sc, int er, int ec);
 };
 
 #endif

@@ -76,7 +76,7 @@ void ChessModel::do_move(Move m) {
   }
 }
 
-Piece* ChessModel::at(std::string s) const{
+Piece* ChessModel::at(std::string s) const {
   if (!is_valid_cord(s)) return nullptr;
   Cord loc = str_to_cord(s);
   return board[loc.row][loc.col];
@@ -91,61 +91,70 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   Piece* target = at(m.end);
 
   MOVE_RESULTS result = is_valid(m, white_to_move);
-  if(result == INVALID_MOVE) return INVALID_MOVE;
+  if (result == INVALID_MOVE) return INVALID_MOVE;
 
-  Move move_to_store{m.start, m.end};
+  Move move_to_store{ m.start, m.end };
   move_to_store.moved = p->type;
   move_to_store.taken = target->type;
   move_to_store.move_result = result;
 
   commit_move(move_to_store);
-  // MOVE_RESULTS check = in_check_or_mate()
+  // check_for_checks() and handle
+  // check_for_mate() and handle
   // if(m.col is in check) undo_move(); return invalid;
   // if(m.col is in checkmate) undo_move(); return invalid;
-  // if(oterh col is in check) return OTHER_IN_CHECK;
-  // if(oterh col is in mate) return OTHER_IN_MATE;
+  // if(other col is in check) return OTHER_IN_CHECK;
+  // if(other col is in mate) return OTHER_IN_MATE;
+  std::cout << "Not finished, if yous ee this its bad\n";
+  return move_to_store.move_result;
 }
 
 // Makes the move M, requires the move result from check validity
 void ChessModel::commit_move(Move m) {
   Piece* p = at(m.start);
   Piece* target = at(m.end);
-  switch(m.move_result) {
-    case CASTLE: // move rook
-      int row = p->col == WHITE ? 8 : 1;
-      if (m.start.col > m.start.col) { // Queen side castle
-        std::swap(board[m.start.row][3]->loc, board[m.start.row][0]->loc);
-        std::swap(board[m.start.row][3], board[m.start.row][0]);
-      } else { // King side castle
-        std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
-        std::swap(board[m.start.row][5], board[m.start.row][7]);
-      }
-      do_move(m);
-      break;
+  switch (m.move_result) {
+  case CASTLE: { // move rook 
+    int row = p->col == WHITE ? 8 : 1;
+    if (m.start.col > m.start.col) { // Queen side castle
+      std::swap(board[m.start.row][3]->loc, board[m.start.row][0]->loc);
+      std::swap(board[m.start.row][3], board[m.start.row][0]);
+    } else { // King side castle
+      std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
+      std::swap(board[m.start.row][5], board[m.start.row][7]);
+    }
+    do_move(m);
+    break;
+  }
 
-    case CAPTURE: // delete target - swap
-      target->set_empty(); // only difference from standard move
-      do_move(m);
-      break;
-    case SUCCESS: // just a move
-      do_move(m);
-      break;
-    
-    case PROMOTION: // get user input on piece to promote
-      // TODO: handle promotion user input
-    
-    case EN_PASSANT: // remove other pawn
-      Piece* other_pawn = board[m.start.row][m.end.col];
-      other_pawn->set_empty();
-      do_move(m);
-      break;
-    case INVALID_MOVE:
-    default:
-      std::cerr << "Something terrible has happend in commit move\n";
-      return;
+  case CAPTURE: { // delete target - swap
+    target->set_empty(); // only difference from standard move
+    do_move(m);
+    break;
+  }
+  case SUCCESS: {// just a move
+    do_move(m);
+    break;
+  }
+
+  case PROMOTION: { // get user input on piece to promote
+    // TODO: handle promotion user input
+    pawn_to_promote = m.start; // now go get user input come back do promotion and check for checks
+
+    break;
+  }
+  case EN_PASSANT: {// remove other pawn
+    Piece* other_pawn = board[m.start.row][m.end.col];
+    other_pawn->set_empty();
+    do_move(m);
+    break;
+  }
+  case INVALID_MOVE:
+  default:
+    std::cerr << "Something terrible has happend in commit move\n";
+    return;
   }
 }
-
 
 // Pre: Start and end are both coordinates within the board
 // Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
@@ -156,7 +165,7 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
   if (!(m.start.row == m.end.row || m.start.col == m.end.col)) return INVALID_MOVE; // piece must move
 
   switch (p->type) {
-  case PAWN:
+  case PAWN: {
     if (m.start.col != m.end.col) { // capture/en pesant
       if (abs(m.start.row - m.end.row) != 1) return INVALID_MOVE; // move one forward
       if (abs(m.start.col - m.end.col) != 1) return INVALID_MOVE; // move one sideways
@@ -175,11 +184,11 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
 
         if (other_pawn->type == PAWN && other_pawn->col != p->col) {
           // last move must be other pawn moving two forward
-          Move last_move = history[history.size()-1];
+          Move last_move = history[history.size() - 1];
           if (last_move.moved != PAWN) return INVALID_MOVE;
           if (abs(last_move.start.row - last_move.end.row) != 2) return INVALID_MOVE;
-          if( !(last_move.start.col == last_move.end.col) || !(last_move.start.col == m.start.col)) return INVALID_MOVE;
-          return EN_PASSANT;          
+          if (!(last_move.start.col == last_move.end.col) || !(last_move.start.col == m.start.col)) return INVALID_MOVE;
+          return EN_PASSANT;
         }
         return INVALID_MOVE;
       }
@@ -198,13 +207,12 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
       if ((p->col == WHITE) && (m.start.row <= m.end.row)) return INVALID_MOVE;
       if ((p->col == BLACK) && (m.start.row >= m.end.row)) return INVALID_MOVE;
       if (target->type != EMPTY) return INVALID_MOVE;
-
-      // TODO: HANDLE PROMOTION HERE
       return SUCCESS;
     }
 
     return INVALID_MOVE;
-  case KING:
+  }
+  case KING: {
     // if moving 2 columnwise, then must be a castle
     if (abs(m.end.row - m.start.row) == 0 && abs(m.end.col - m.start.col) == 2) {
       if (p->has_moved) return INVALID_MOVE; // king can't have moved
@@ -243,7 +251,8 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
       }
     }
     return INVALID_MOVE;
-  case KNIGHT:
+  }
+  case KNIGHT: {
     // either the row differs by 1 and the col differs by 2, or the row differs by 2 and the col differs by 1
     if (!((abs(m.end.row - m.start.row) == 1 && abs(m.end.col - m.start.col) == 2) || abs(m.end.row - m.start.row) == 2 && abs(m.end.col - m.start.col) == 1)) return INVALID_MOVE;
 
@@ -252,8 +261,8 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
     }
     if (target->col == p->col) return INVALID_MOVE; // can't capture same col piece
     return CAPTURE;
-
-  case BISHOP:
+  }
+  case BISHOP: {
 
     // if the change in row is not the same as the change in col, then it is invalid
     if (!(abs(m.end.row - m.start.row) == abs(m.end.col - m.start.col))) return INVALID_MOVE;
@@ -275,8 +284,8 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
     }
     if (target->col == p->col) return INVALID_MOVE; // can't capture same col piece
     return CAPTURE;
-
-  case ROOK:
+  }
+  case ROOK: {
 
     // if both the row and the col don't remain the same it is invalid
     if (!(m.start.row == m.end.row || m.start.col == m.end.col)) return INVALID_MOVE;
@@ -303,11 +312,11 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
     }
 
     if (target->type == EMPTY) return SUCCESS;
-    
+
     if (target->col == p->col) return INVALID_MOVE; // can't capture same col piece
     return CAPTURE;
-
-  case QUEEN: // TODO seperate out rook/bishop logic?
+  }
+  case QUEEN: {// TODO seperate out rook/bishop logic?
 
     // bishop logic
     if (abs(m.end.row - m.start.row) == abs(m.end.col - m.start.col)) {
@@ -366,10 +375,11 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
     } else {
       return INVALID_MOVE;
     }
-
-  default:
+  }
+  default: {
     std::cout << "Not implemented yet, ignoring move";
     return INVALID_MOVE;
+  }
   }
   return SUCCESS;
 }

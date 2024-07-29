@@ -4,7 +4,7 @@
 
 class Player {
 public:
-    virtual Move make_move() = 0;
+    virtual Move make_move(bool) = 0;
 };
 
 #endif

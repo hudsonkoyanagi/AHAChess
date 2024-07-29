@@ -61,6 +61,7 @@ public:
     // friend std::istream& operator>>(std::istream& is, ChessModel& b);
     // friend std::ostream& operator<<(std::ostream& os, const ChessModel& b);
     friend class ComputerPlayer;
+    friend class Level1;
 };
 
 #endif
