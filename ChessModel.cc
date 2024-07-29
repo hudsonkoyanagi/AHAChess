@@ -267,6 +267,104 @@ void ChessModel::do_move(Move m) {
   }
 }
 
+// undo move
+void ChessModel::undo_move() {
+  Move m = history.back();
+  MOVE_RESULTS result = m.move_result;
+  Piece* p = board[m.end.row][m.end.col];
+  COLOURS player_colour = p->col;
+  COLOURS opponent_colour = (p->col == WHITE) ? BLACK : WHITE;
+
+  switch (result) {
+    case SUCCESS:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      break;
+    case STALEMATE:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      break;
+    case BLACK_CHECKMATED:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      break;
+    case WHITE_CHECKMATED:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      break;
+    case CAPTURE:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      p->type = taken;
+      p->col = opponent_colour;
+      p->has_moved = m.taken_had_moved_prior;
+      break;
+    case EN_PASSANT:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      board[m.start.row][m.end.col]->type = taken;
+      board[m.start.row][m.end.col]->col = opponent_colour;
+      board[m.start.row][m.end.col]->has_moved = m.taken_had_moved_prior;
+      break;
+    case CASTLE:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      // king side castle
+      if (m.end.col > m.start.col) {
+        // if WHITE, swap rook to bot right
+        if (player_colour == WHITE) {
+          std::swap(board[7][7], board[7][5]);
+          board[7][7]->has_moved = false;
+        }
+        // otherwise, swap rook to top right
+        else {
+          std::swap(board[0][7], board[0][5]);
+          board[0][7]->has_moved = false;
+        }
+      }
+      // queen side castle
+      else {
+        // if WHITE, swap rook to bot left
+        if (player_colour == WHITE) {
+          std::swap(board[7][0], board[7][3]);
+          board[7][0]->has_moved = false;
+        }
+        // otherwise, swap rook to top left
+        else {
+          std::swap(board[0][0], board[0][3]);
+          board[0][0]->has_moved = false;
+        }
+      }
+      break;
+    case PROMOTION:
+      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+      board[m.start.row][m.start.col]->type = PAWN;
+      break;
+  }
+
+  history.pop_back();
+
+  // check if the current is in check; undoing the move will undo the check
+  if (m.check) {
+    if (player_colour == WHITE) {
+      black_in_check = false;
+    }
+    else {
+      white_in_check = false;
+    }
+  }
+  // check if the previous was in check; undoing the move will redo the check
+  else {
+    if (history.back().check) {
+      if (player_colour == WHITE) {
+        white_in_check = true;
+      }
+      else {
+        black_in_check = true;
+      }
+    }
+  }
+
+  // check if the piece has moved prior; if not, then reset that flag for the piece
+  if (m.had_moved_prior == false) {
+    board[m.start.row][m.end.row]->has_moved = false;
+  }
+
+}
+
 Piece* ChessModel::at(std::string s) const {
   if (!is_valid_cord(s)) {
 
