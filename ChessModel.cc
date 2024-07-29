@@ -203,7 +203,7 @@ void ChessModel::commit_move(Move m) {
 MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
   MOVE_RESULTS pre = check_pre_move(m, white_to_move);
   if (pre == INVALID_MOVE) return INVALID_MOVE;
-
+  MOVE_RESULTS post = check_post_move(m,white_to_move);
   std::cout<<"line 205"<<std::endl;
   if(post == SUCCESS) return pre;
   std::cout<<"is_valid running"<<std::endl;
