@@ -62,6 +62,9 @@ public:
     // friend std::ostream& operator<<(std::ostream& os, const ChessModel& b);
     friend class ComputerPlayer;
     friend class Level1;
+    friend class Level2;
+    friend class Level3;
+    friend class Level4;
 };
 
 #endif

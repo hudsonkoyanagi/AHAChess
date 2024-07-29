@@ -1,4 +1,4 @@
-#include "Level1.h"
+#include "Level2.h"
 #include "ComputerPlayer.h"
 #include "Enums.h"
 #include <cstdlib> 
@@ -6,10 +6,12 @@
 #include <iostream>
 
 //random legal moves that will be checked by randomly picking a piece and picking a random possible location
-MOVE_RESULTS Level1::make_move(bool white_to_move) {
-    std::cout << "Computer 1 making move\n";
+MOVE_RESULTS Level2::make_move(bool white_to_move) {
+    std::cout << "Computer 2 making move\n";
     //iterate through board and then for each we see if
     std::vector<Move> valid_moves;
+    std::vector<Move> valid_checks;
+    std::vector<Move> valid_captures;
     for (int i = 0;i < 8;++i) {
         for (int j = 0;j < 8;++j) {
             Piece* currPiece = model->board[i][j];
@@ -21,6 +23,11 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
                         if (currMove != INVALID_MOVE) {
                             Move mv{ Cord{i,j}, Cord{m,n} };
                             mv.move_result = currMove;
+                            if(currMove == CAPTURE){
+                                valid_captures.push_back(mv);
+                            }
+                            //TODO
+                            else if(currMove)
                             valid_moves.push_back(mv);
                         }
                     }
@@ -43,7 +50,6 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
     if (!valid_moves.empty()) {
         Move m = valid_moves[std::rand() % valid_moves.size()];
         model->make_move(m, white_to_move);
-        std::cout<<"Move result from Level1.cc "<<m.move_result<<std::endl;
         return m.move_result;
     }
     // std::cout<<"Why are you invalid"<<std::endl;

@@ -149,13 +149,13 @@ void ChessController::game_loop() {
         white_wins += 0.5;
         black_wins += 0.5;
         return;
-      case BLACK_IN_CHECK:
-        std::cout << "Black is in check.\n";
-        white_to_move = !white_to_move;
-        break;
-      case WHITE_IN_CHECK:
-        std::cout << "White is in check.\n";
-        white_to_move = !white_to_move;
+      // case BLACK_IN_CHECK:
+      //   std::cout << "Black is in check.\n";
+      //   white_to_move = !white_to_move;
+      //   break;
+      // case WHITE_IN_CHECK:
+      //   std::cout << "White is in check.\n";
+      //   white_to_move = !white_to_move;
         break;
       case CAPTURE:
         white_to_move = !white_to_move;
