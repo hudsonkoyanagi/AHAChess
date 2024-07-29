@@ -54,7 +54,7 @@ MOVE_RESULTS Level3::make_move(bool white_to_move) {
     }
     //if we are currently in check then get out of check
     COLOURS currColour = white_to_move ? WHITE : BLACK;
-    if(model->check_exists(currColour)){
+    if(model->is_in_check(currColour)){
         for (int i = 0;i < 8;++i) {
             for (int j = 0;j < 8;++j) {
                 Piece* currPiece = model->board[i][j];
@@ -67,7 +67,7 @@ MOVE_RESULTS Level3::make_move(bool white_to_move) {
                                 Move mv{ Cord{i,j}, Cord{m,n} };
                                 mv.move_result = currMove;
                                 model->make_move(mv,white_to_move);
-                                if(model->check_exists(currPiece->col)){
+                                if(model->is_in_check(currPiece->col)){
                                     model->undo_move(mv);
                                 }
                                 else{

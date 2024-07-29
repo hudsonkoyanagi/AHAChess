@@ -452,11 +452,15 @@ MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
   return SUCCESS; // TODO implement
   commit_move(m);
   if (is_in_check(WHITE)) {
-    if (white_to_move) return INVALID_MOVE; // white can't put itself in check
-    
-
+    if (white_to_move){
+      undo_move(m);
+      return INVALID_MOVE; // white can't put itself in check
+    } 
   } else if(is_in_check(BLACK)) {
-
+      if(!white_to_move){
+        undo_move(m);
+        return INVALID_MOVE;
+      } 
   } else {
     return SUCCESS;
   }
