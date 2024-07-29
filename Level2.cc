@@ -26,28 +26,50 @@ MOVE_RESULTS Level2::make_move(bool white_to_move) {
                             if(currMove == CAPTURE){
                                 valid_captures.push_back(mv);
                             }
-                            //TODO
-                            else if(currMove)
-                            valid_moves.push_back(mv);
+                            else if(currMove == CAPTURE_WITH_CHECK || currMove == PROMOTE_WITH_CHECK || currMove == MOVE_WITH_CHECK || currMove  == CASTLE_WITH_CHECK || currMove == EN_PASSANT_WITH_CHECK){
+                                valid_checks.push_back(mv);
+                            }
+                            else{
+                                valid_moves.push_back(mv);
+                            }
                         }
                     }
                 }
             } else if (currPiece->col == BLACK && !white_to_move) {
-                for (int m = 0;m < 8;++m) {
+                for (int m = 0; m < 8;++m) {
                     for (int n = 0;n < 8;++n) {
                         std::cout << "";
                         MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
                         if (currMove != INVALID_MOVE) {
                             Move mv{ Cord{i,j}, Cord{m,n} };
                             mv.move_result = currMove;
-                            valid_moves.push_back(mv);
+                            if(currMove == CAPTURE){
+                                valid_captures.push_back(mv);
+                            }
+                            else if(currMove == CAPTURE_WITH_CHECK || currMove == PROMOTE_WITH_CHECK || currMove == MOVE_WITH_CHECK || currMove  == CASTLE_WITH_CHECK || currMove == EN_PASSANT_WITH_CHECK){
+                                valid_checks.push_back(mv);
+                            }
+                            else{
+                                valid_moves.push_back(mv);
+                            }
                         }
                     }
                 }
             }
         }
     }
-    if (!valid_moves.empty()) {
+    //prioritize checks>captures>random moves
+    if(!valid_checks.empty()){
+        Move m = valid_checks[std::rand() % valid_checks.size()];
+        model->make_move(m, white_to_move);
+        return m.move_result;
+    }
+    else if(!valid_captures.empty()){
+        Move m = valid_captures[std::rand() % valid_captures.size()];
+        model->make_move(m, white_to_move);
+        return m.move_result;
+    }
+    else if (!valid_moves.empty()) {
         Move m = valid_moves[std::rand() % valid_moves.size()];
         model->make_move(m, white_to_move);
         return m.move_result;
