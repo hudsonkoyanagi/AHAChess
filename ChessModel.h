@@ -33,11 +33,14 @@ public:
     void reset();
     void empty();
     
-    MOVE_RESULTS is_valid(Move m, bool white_to_move);
+    MOVE_RESULTS is_valid(Move m, bool white_to_move) const;
     MOVE_RESULTS make_move(Move m, bool white_to_move);
     void commit_move(Move m);
     void do_move(Move m);       // Actually updates board state
     void do_capture(Move m);    // Updates board and erases piece at m.end
+
+    MOVE_RESULTS check_for_mate() const;
+    MOVE_RESULTS check_for_checks() const;
 
     void setup_start(); // empties board
     void setup_add_piece(char piece, Cord move);
@@ -46,7 +49,7 @@ public:
     bool setup_finish(); // returns false if setup cannot be finished (invalid pawns, kings, etc)
 
 
-    Piece* at(std::string s); // returns piece at cord string or nullptr if invalid
+    Piece* at(std::string s) const; // returns piece at cord string or nullptr if invalid
 
 
     void notify_views();

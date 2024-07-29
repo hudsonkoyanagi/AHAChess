@@ -417,12 +417,13 @@ void ChessModel::register_view(ChessView* v) {
   views.push_back(v);
 }
 
-// Actually updates board state
+// Swaps pieces at start and end
 void ChessModel::do_move(Move m) {
   Piece* p = board[m.start.row][m.start.col];
   Piece* target = board[m.end.row][m.end.col];
   std::swap(target->loc, p->loc); // update piece location
   std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
+
   history.push_back(m);
   p->has_moved = true;
   for (auto v : views) {
@@ -430,25 +431,7 @@ void ChessModel::do_move(Move m) {
   }
 }
 
-// Updates board and erases piece at m.end
-void ChessModel::do_capture(Move m) {
-  Piece* p = board[m.start.row][m.start.col];
-  Piece* target = board[m.end.row][m.end.col];
-  target->set_empty();
-  std::swap(target->loc, p->loc);
-  std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-
-
-
-  history.push_back(m);
-  p->has_moved = true;
-
-  for (auto v : views) {
-    v->render(board);
-  }
-}
-
-Piece* ChessModel::at(std::string s) {
+Piece* ChessModel::at(std::string s) const{
   if (!is_valid_cord(s)) return nullptr;
   Cord loc = str_to_cord(s);
   return board[loc.row][loc.col];
@@ -474,9 +457,8 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   // if(oterh col is in mate) return OTHER_IN_MATE;
 }
 
+// Makes the move M, requires the move result from check validity
 void ChessModel::commit_move(Move m) {
-
-
   Piece* p = board[m.start.row][m.start.col];
   Piece* target = board[m.end.row][m.end.col];
   switch(m.move_result) {
@@ -501,27 +483,24 @@ void ChessModel::commit_move(Move m) {
       break;
     
     case PROMOTION: // get user input on piece to promote
+      // TODO: handle promotion user input
     
     case EN_PASSANT: // remove other pawn
-    
-    
+      Piece* other_pawn = board[m.start.row][m.end.col];
+      other_pawn->set_empty();
+      do_move(m);
+      break;
     case INVALID_MOVE:
+    default:
+      std::cerr << "Something terrible has happend in commit move\n";
+      return;
   }
-  target->set_empty();
-  std::swap(target->loc, p->loc);
-  std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-
-
-
-  history.push_back(m);
-  p->has_moved = true;
-
-
 }
 
 
-// Start and end are both coordinates within the board
-MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
+// Pre: Start and end are both coordinates within the board
+// Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
+MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
   Piece* p = board[m.start.row][m.start.col];
   Piece* target = board[m.end.row][m.end.col];
   if ((p->col == WHITE && !white_to_move) || (p->col == BLACK && white_to_move)) return INVALID_MOVE; // correct colour check
@@ -540,17 +519,20 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
         return CAPTURE;
       }
 
-      if (target->type == EMPTY) { // TODO: en pessant
+      if (target->type == EMPTY) {
 
         // both pawns are on the same row but adjacent columns
         Piece* other_pawn = board[m.start.row][m.end.col];
 
         if (other_pawn->type == PAWN && other_pawn->col != p->col) {
           // last move must be other pawn moving two forward
-          
+          Move last_move = history[history.size()-1];
+          if (last_move.moved != PAWN) return INVALID_MOVE;
+          if (abs(last_move.start.row - last_move.end.row) != 2) return INVALID_MOVE;
+          if( !(last_move.start.col == last_move.end.col) || !(last_move.start.col == m.start.col)) return INVALID_MOVE;
+          return EN_PASSANT;          
         }
-
-
+        return INVALID_MOVE;
       }
     }
     if (abs(m.start.row - m.end.row) == 2) { // starting square 
@@ -743,3 +725,4 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
   }
   return SUCCESS;
 }
+
