@@ -64,8 +64,8 @@ void ChessModel::register_view(ChessView* v) {
 
 // finds the king location
 Piece* ChessModel::find_king(COLOURS king_col) {
-  for (int r=0;r<8;++r) {
-    for (int c=0;c<8;++c) {
+  for (int r = 0;r < 8;++r) {
+    for (int c = 0;c < 8;++c) {
       if (board[r][c]->type == KING) {
         if (king_col == WHITE && board[r][c]->col == WHITE) {
           return board[r][c];
@@ -84,10 +84,10 @@ bool ChessModel::is_in_check(COLOURS king_col) {
 
   Piece* k = find_king(king_col);
 
-  for (int r=0;r<8;++r) {
-    for (int c=0;c<8;++c) {
+  for (int r = 0;r < 8;++r) {
+    for (int c = 0;c < 8;++c) {
       if (board[r][c]->type != EMPTY && board[r][c]->col != king_col) {
-        MOVE_RESULTS r = check_pre_move(Move{board[r][c]->loc, k->loc}, white_to_move);
+        MOVE_RESULTS r = check_pre_move(Move{ board[r][c]->loc, k->loc }, white_to_move);
         if (r == CAPTURE_WITH_CHECK || r == PROMOTE_WITH_CHECK || r == MOVE_WITH_CHECK || r == CASTLE_WITH_CHECK || r == EN_PASSANT_WITH_CHECK) {
           return true;
         }
@@ -117,6 +117,10 @@ Piece* ChessModel::at(std::string s) const {
 }
 
 Piece* ChessModel::at(Cord c) const {
+  if(c.col > 7 || c.col <0 || c.row > 7 || c.row <0) {
+    std::cout << "FUCKED CORD\n";
+    return nullptr;
+  }
   return board[c.row][c.col];
 }
 
@@ -125,8 +129,8 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   Piece* target = at(m.end);
 
   MOVE_RESULTS result = is_valid(m, white_to_move);
-  if (result == INVALID_MOVE){
-     return INVALID_MOVE;
+  if (result == INVALID_MOVE) {
+    return INVALID_MOVE;
   }
 
   Move move_to_store{ m.start, m.end };
@@ -198,9 +202,7 @@ void ChessModel::commit_move(Move m) {
 // Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
 MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
   MOVE_RESULTS pre = check_pre_move(m, white_to_move);
-  if(pre == INVALID_MOVE) return INVALID_MOVE;
-  MOVE_RESULTS post = check_post_move(m, white_to_move);
-  if(post == INVALID_MOVE) return INVALID_MOVE;
+  if (pre == INVALID_MOVE) return INVALID_MOVE;
 
   std::cout<<"line 205"<<std::endl;
   if(post == SUCCESS) return pre;
@@ -449,20 +451,57 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
 // Check the after results of a move (what's in check(mate))
 // Pre: check_pre_move has determined piecewise validity
 MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
-  return SUCCESS; // TODO implement
   commit_move(m);
-  if (is_in_check(WHITE)) {
-    if (white_to_move){
-      undo_move(m);
-      return INVALID_MOVE; // white can't put itself in check
-    } 
-  } else if(is_in_check(BLACK)) {
-      if(!white_to_move){
-        undo_move(m);
+
+  bool temp_white_in_check = is_in_check(WHITE);
+  bool temp_black_in_check = is_in_check(BLACK);
+
+  if (white_to_move) {
+    if (temp_white_in_check) {
+      undo_move();
+      return INVALID_MOVE;
+    } else if (temp_black_in_check) {
+      undo_move();
+      switch (m.move_result) {
+      case SUCCESS:
+        return MOVE_WITH_CHECK;
+      case CAPTURE:
+        return CAPTURE_WITH_CHECK;
+      case PROMOTION:
+        return PROMOTE_WITH_CHECK;
+      case EN_PASSANT:
+        return EN_PASSANT;
+      case CASTLE:
+        return CASTLE_WITH_CHECK;
+      default:
         return INVALID_MOVE;
-      } 
-  } else {
-    return SUCCESS;
+      }
+    } else {
+      return SUCCESS;
+    }
+  } else { // black to move
+    if (temp_black_in_check) {
+      undo_move();
+      return INVALID_MOVE;
+    } else if (temp_white_in_check) {
+      undo_move();
+      switch (m.move_result) {
+      case SUCCESS:
+        return MOVE_WITH_CHECK;
+      case CAPTURE:
+        return CAPTURE_WITH_CHECK;
+      case PROMOTION:
+        return PROMOTE_WITH_CHECK;
+      case EN_PASSANT:
+        return EN_PASSANT;
+      case CASTLE:
+        return CASTLE_WITH_CHECK;
+      default:
+        return INVALID_MOVE;
+      }
+    } else {
+      return SUCCESS;
+    }
   }
 }
 
