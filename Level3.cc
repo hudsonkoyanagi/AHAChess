@@ -68,7 +68,7 @@
 //                                 mv.move_result = currMove;
 //                                 model->make_move(mv,white_to_move);
 //                                 if(model->is_in_check(currPiece->col)){
-//                                     model->undo_move(mv);
+//                                     model->undo_move();
 //                                 }
 //                                 else{
 //                                     return mv.move_result;

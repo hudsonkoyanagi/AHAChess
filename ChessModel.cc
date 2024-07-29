@@ -371,7 +371,7 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
   // MOVE_RESULTS post = check_post_move(m,white_to_move);
   // std::cout<<"line 205"<<std::endl;
   // if(post == SUCCESS) return pre;
-  std::cout << "is_valid running" << std::endl;
+  // std::cout << "is_valid running" << std::endl;
   return pre;
 }
 
