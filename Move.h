@@ -4,7 +4,7 @@
 #include "Enums.h"
 
 class Move {
-    public:
+public:
     // bool is_resign = false;
     Cord start;
     Cord end;
@@ -15,7 +15,8 @@ class Move {
     MOVE_RESULTS move_result;
 
     bool check = false;
-    
+    bool had_moved_prior = false;
+
     Move(Cord s, Cord e);
     Move(int sr, int sc, int er, int ec);
 };

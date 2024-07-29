@@ -4,7 +4,7 @@
 #include "Move.h"
 
 class Level1 : public ComputerPlayer {
- public:
+public:
   Level1(ChessModel* model) : ComputerPlayer(model) {}
   Move make_move(bool white_to_move) override;
 };
