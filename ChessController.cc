@@ -132,15 +132,10 @@ void ChessController::input_loop() {
 
       if (p1_good && p2_good) game_loop();
     } else if (command == "setup") {
-      model->empty();
       setup_loop();
-      if(isValidBoard()){
-        input_loop();
-      }
-      else{
-        std::cout<<"Try again, the setup conditions are invalid"<<std::endl;
-        setup_loop();
-      }
+      // if(isValidBoard()){
+      //   input_loop();
+      // }
     } else {
       std::cout << "Invalid command: " << command << ". Please try again. \n";
     }
@@ -217,6 +212,7 @@ void ChessController::game_loop() {
 }
 
 void ChessController::setup_loop() { 
+  model->empty();
   std::cout<<"In setup mode"<<std::endl;
   std::string command;
   char piece; 
@@ -224,6 +220,7 @@ void ChessController::setup_loop() {
   std::string colour;
   while(std::cin>>command){
     if(command == "+"){
+      std::cout<<"Adding a piece"<<std::endl;
       std::cin>>piece;
       std::cin>>pos;
       if(!is_valid_cord(pos)){
@@ -231,49 +228,32 @@ void ChessController::setup_loop() {
         continue;
       }
       Cord currPos = str_to_cord(pos);
-      switch(piece){
-        case 'P':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,PAWN};
-          break;
-        case 'R':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,ROOK};
-          break;
-        case 'N':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,KNIGHT};
-          break;
-        case 'B':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,BISHOP};
-          break;
-        case 'Q':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,QUEEN};
-          break;
-        case 'K':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,KING};
-          break;
-        case 'p':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,PAWN};
-          break;
-        case 'r':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,ROOK};
-          break;
-        case 'n':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,KNIGHT};
-          break;
-        case 'b':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,BISHOP};
-          break;
-        case 'q':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,QUEEN};
-          break;
-        case 'k':
-          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,KING};
-          break;
+      PIECES pieceType;
+      COLOURS pieceColour;
+      switch (piece) {
+        case 'P': pieceType = PAWN; pieceColour = WHITE; break;
+        case 'R': pieceType = ROOK; pieceColour = WHITE; break;
+        case 'N': pieceType = KNIGHT; pieceColour = WHITE; break;
+        case 'B': pieceType = BISHOP; pieceColour = WHITE; break;
+        case 'Q': pieceType = QUEEN; pieceColour = WHITE; break;
+        case 'K': pieceType = KING; pieceColour = WHITE; break;
+        case 'p': pieceType = PAWN; pieceColour = BLACK; break;
+        case 'r': pieceType = ROOK; pieceColour = BLACK; break;
+        case 'n': pieceType = KNIGHT; pieceColour = BLACK; break;
+        case 'b': pieceType = BISHOP; pieceColour = BLACK; break;
+        case 'q': pieceType = QUEEN; pieceColour = BLACK; break;
+        case 'k': pieceType = KING; pieceColour = BLACK; break;
         default:
-          std::cout<<"Invalid piece entered"<<std::endl;
+          std::cout << "Invalid piece entered" << std::endl;
           continue;
       }
+      Piece* targetPiece = model->board[currPos.row][currPos.col];
+      targetPiece->type = pieceType;
+      targetPiece->col = pieceColour;
+      targetPiece->loc = currPos;
     }
     else if(command == "-"){
+      std::cout<<"Removing a piece"<<std::endl;
       std::cin>>pos;
       if(!is_valid_cord(pos)){
         std::cout<<"invalid coord"<<std::endl;
@@ -283,6 +263,7 @@ void ChessController::setup_loop() {
       model->board[currPos.row][currPos.col]->set_empty();
     }
     else if(command == "="){
+      std::cout<<"Changing Colour"<<std::endl;
       std::cin>>colour;
       if(colour == "black"){
         white_to_move = false;
@@ -296,7 +277,19 @@ void ChessController::setup_loop() {
       }
     }
     else if(command == "done"){
-      return;
+      std::cout<<"Exiting Setup"<<std::endl;
+      if(isValidBoard()){
+        input_loop();
+      }
+      else{
+        std::cout<<"Try again, the setup conditions are invalid"<<std::endl;
+        // model->empty();
+        setup_loop();
+      }
+    }
+    else{
+      std::cout<<"Invalid Command entered"<<std::endl;
+      continue;
     }
   }
  }
