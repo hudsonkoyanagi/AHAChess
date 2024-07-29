@@ -12,10 +12,12 @@ public:
     // Move flags
     PIECES moved;
     PIECES taken;
+    PIECES promoted;
     MOVE_RESULTS move_result;
 
     bool check = false;
     bool had_moved_prior = false;
+    bool king_castle = false;
 
     Move(Cord s, Cord e);
     Move(int sr, int sc, int er, int ec);
