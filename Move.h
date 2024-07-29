@@ -19,6 +19,8 @@ public:
 
     Move(Cord s, Cord e);
     Move(int sr, int sc, int er, int ec);
+
+    void print();
 };
 
 #endif
