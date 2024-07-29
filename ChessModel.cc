@@ -290,13 +290,13 @@ void ChessModel::undo_move() {
     break;
   case CAPTURE:
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-    p->type = taken;
+    p->type = m.taken;
     p->col = opponent_colour;
     p->has_moved = m.taken_had_moved_prior;
     break;
   case EN_PASSANT:
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-    board[m.start.row][m.end.col]->type = taken;
+    board[m.start.row][m.end.col]->type = m\m.taken;
     board[m.start.row][m.end.col]->col = opponent_colour;
     board[m.start.row][m.end.col]->has_moved = m.taken_had_moved_prior;
     break;
