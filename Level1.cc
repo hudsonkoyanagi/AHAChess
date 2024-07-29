@@ -49,7 +49,7 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
     if (!valid_moves.empty()) {
         Move m = valid_moves[std::rand() % valid_moves.size()];
         model->make_move(m, white_to_move);
-        std::cout<<"Move result from Level1.cc "<<m.move_result<<std::endl;
+        // std::cout<<"Move result from Level1.cc "<<m.move_result<<std::endl;
         return m.move_result;
     }
     // std::cout<<"Why are you invalid"<<std::endl;

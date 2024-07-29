@@ -6,6 +6,9 @@
 #include "Player.h"
 #include "utils.h"
 #include "Level1.h"
+#include "Level2.h"
+// #include "Level3.h"
+// #include "Level4.h"
 
 
 bool is_valid_computer(const std::string& s) {
@@ -45,8 +48,8 @@ void ChessController::input_loop() {
             // p1 = nullptr;
             break;
           case '2':
-            // p1 = new Level2{model};
-            p1 = nullptr;
+            p1 = new Level2{model};
+            // p1 = nullptr;
             break;
           case '3':
             // p1 = new Level3{model};
@@ -77,8 +80,8 @@ void ChessController::input_loop() {
           p2 = new Level1{ model };
           break;
         case '2':
-          // p2 = new Level2{model};
-          p2 = nullptr;
+          p2 = new Level2{model};
+          // p2 = nullptr;
           break;
         case '3':
           // p2 = new Level3{model};
