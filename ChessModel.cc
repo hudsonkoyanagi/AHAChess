@@ -62,6 +62,40 @@ void ChessModel::register_view(ChessView* v) {
   views.push_back(v);
 }
 
+// finds the king location
+Piece* ChessModel::find_king(COLOURS king_col) {
+  for (int r=0;r<8;++r) {
+    for (int c=0;c<8;++c) {
+      if (board[r][c]->type == KING) {
+        if (king_col == WHITE && board[r][c]->col == WHITE) {
+          return board[r][c];
+        }
+        if (king_col == BLACK && board[r][c]->col == BLACK) {
+          return board[r][c];
+        }
+      }
+    }
+  }
+}
+
+// checking if the board has any checks
+bool ChessModel::check_exists(COLOURS king_col) {
+  bool white_to_move = (king_col == WHITE) ? false : true;  // if we are checking the WHITE king, check as if it's a BLACK move, and vice versa
+
+  Piece* k = find_king(king_col);
+
+  for (int r=0;r<8;++r) {
+    for (int c=0;c<8;++c) {
+      if (board[r][c]->type != EMPTY && board[r][c]->col != king_col) {
+        MOVE_RESULTS r = is_valid(MOVE{board[r][c]->loc, k->loc}, white_to_move);
+        if (r == CAPTURE_WITH_CHECK || r == PROMOTE_WITH_CHECK || r == MOVE_WITH_CHECK || r == CASTLE_WITH_CHECK || r == EN_PASSANT_WITH_CHECK) {
+          return true;
+        }
+      }
+    }
+  }
+}
+
 // Swaps pieces at start and end
 void ChessModel::do_move(Move m) {
   Piece* p = at(m.start);
