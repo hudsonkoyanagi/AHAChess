@@ -71,25 +71,25 @@ void ChessController::input_loop() {
         delete p1;
         p1_good = true;
         switch (second[8]) {
-          case '1':
-            p1 = new Level1{ model };
-            // p1 = nullptr;
-            break;
-          case '2':
-            p1 = new Level2{model};
-            // p1 = nullptr;
-            break;
-          case '3':
-            // p1 = new Level3{model};
-            p1 = nullptr;
-            break;
-          case '4':
-            // p1 = new Level4{model};
-            p1 = nullptr;
-            break;
-          default:
-            std::cout << "Computer parsing logic gone wrong: abort\n";
-            return;
+        case '1':
+          p1 = new Level1{ model };
+          // p1 = nullptr;
+          break;
+        case '2':
+          p1 = new Level2{ model };
+          // p1 = nullptr;
+          break;
+        case '3':
+          // p1 = new Level3{model};
+          p1 = nullptr;
+          break;
+        case '4':
+          // p1 = new Level4{model};
+          p1 = nullptr;
+          break;
+        default:
+          std::cout << "Computer parsing logic gone wrong: abort\n";
+          return;
         }
       } else {
         std::cout << "Invalid player name: '" << second
@@ -108,7 +108,7 @@ void ChessController::input_loop() {
           p2 = new Level1{ model };
           break;
         case '2':
-          p2 = new Level2{model};
+          p2 = new Level2{ model };
           // p2 = nullptr;
           break;
         case '3':
@@ -151,12 +151,13 @@ void ChessController::game_loop() {
   while (std::cin >> command) {
     if (command == "move") {
       MOVE_RESULTS res;
+      Move move_made{-1,-1,-1,-1};
       //verify if it is white's turn to move, white is a computer player
       if (white_to_move && p1 != nullptr) {
-        std::cout<<"Bot moving WHITE"<<std::endl;
+        std::cout << "Bot moving WHITE" << std::endl;
         res = p1->make_move(white_to_move);
       } else if (!white_to_move && p2 != nullptr) {
-        std::cout<<"Bot moving BLACK"<<std::endl;
+        std::cout << "Bot moving BLACK" << std::endl;
         res = p2->make_move(white_to_move);
       } else {
         std::cin >> start >> end;
@@ -164,43 +165,49 @@ void ChessController::game_loop() {
           std::cout << "Invalid chess coordinates, try again\n";
           continue; // retry loop
         }
-        res = model->make_move(Move{ str_to_cord(start), str_to_cord(end) }, white_to_move);
+        move_made = model->make_move(Move{ str_to_cord(start), str_to_cord(end) }, white_to_move);
+        res = move_made.move_result;
       }
 
-      switch (res) {
-      case INVALID_MOVE:
-        std::cout << "Invalid move played, try again\n";
-        break;
-      case BLACK_CHECKMATED:  // end game
-        std::cout << "Checkmate! White wins!\n";
-        white_wins += 1;
-        return;
-      case WHITE_CHECKMATED:  // end game
-        std::cout << "Checkmate! Black wins!\n";
-        black_wins += 1;
-        return;
-      case STALEMATE:
-        std::cout << "Stalemate!\n";
-        white_wins += 0.5;
-        black_wins += 0.5;
-        return;
-      // case BLACK_IN_CHECK:
-      //   std::cout << "Black is in check.\n";
-      //   white_to_move = !white_to_move;
-      //   break;
-      // case WHITE_IN_CHECK:
-      //   std::cout << "White is in check.\n";
-      //   white_to_move = !white_to_move;
-        break;
-      case CAPTURE:
-        white_to_move = !white_to_move;
-        break;
-      case SUCCESS:
-        white_to_move = !white_to_move;
-      default:
-        break;
-      }
+      if (move_made.check) {
+        if (white_to_move) {
+          std::cout << "Black is in check.\n";
+          white_to_move = !white_to_move;
+          break;
+        } else {
+          std::cout << "White is in check.\n";
+          white_to_move = !white_to_move;
+          break;
 
+        }
+      } else {
+
+        switch (res) {
+        case INVALID_MOVE:
+          std::cout << "Invalid move played, try again\n";
+          break;
+        case BLACK_CHECKMATED:  // end game
+          std::cout << "Checkmate! White wins!\n";
+          white_wins += 1;
+          return;
+        case WHITE_CHECKMATED:  // end game
+          std::cout << "Checkmate! Black wins!\n";
+          black_wins += 1;
+          return;
+        case STALEMATE:
+          std::cout << "Stalemate!\n";
+          white_wins += 0.5;
+          black_wins += 0.5;
+          return;
+        case CAPTURE:
+          white_to_move = !white_to_move;
+          break;
+        case SUCCESS:
+          white_to_move = !white_to_move;
+        default:
+          break;
+        }
+      }
     } else if (command == "resign") {
     } else {
     }
