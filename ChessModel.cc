@@ -186,9 +186,18 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
         if (other_pawn->type == PAWN && other_pawn->col != p->col) {
           // last move must be other pawn moving two forward
           Move last_move = history[history.size() - 1];
-          if (last_move.moved != PAWN) return INVALID_MOVE;
-          if (abs(last_move.start.row - last_move.end.row) != 2) return INVALID_MOVE;
-          if (!(last_move.start.col == last_move.end.col) || !(last_move.start.col == m.start.col)) return INVALID_MOVE;
+          if (last_move.moved != PAWN) {
+            std::cout << "wrong last piece\n";
+            return INVALID_MOVE;
+          }
+          if (abs(last_move.start.row - last_move.end.row) != 2){
+            std::cout << "wrong last move amount\n";
+            return INVALID_MOVE;
+          } 
+          if (last_move.start.col != last_move.end.col || last_move.start.col != m.end.col){
+            std::cout << "wrong last column\n";
+            return INVALID_MOVE;
+          } 
           return EN_PASSANT;
         }
         return INVALID_MOVE;
