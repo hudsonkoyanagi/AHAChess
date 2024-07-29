@@ -1,10 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #include "Move.h"
+#include "Enums.h"
 
 class Player {
 public:
-    virtual Move make_move(bool) = 0;
+    virtual MOVE_RESULTS make_move(bool) = 0;
 };
 
 #endif
