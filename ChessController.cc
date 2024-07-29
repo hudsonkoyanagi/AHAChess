@@ -38,7 +38,7 @@ int blackKingCount = 0;
       }
     }
   }
-  if(whiteKingCount>1 || blackKingCount >1){
+  if(whiteKingCount!= 1 || blackKingCount != 1){
     return false;
   }
   return true;
@@ -130,6 +130,7 @@ void ChessController::input_loop() {
 
       if (p1_good && p2_good) game_loop();
     } else if (command == "setup") {
+      model->empty();
       setup_loop();
       if(isValidBoard()){
         input_loop();
@@ -181,7 +182,6 @@ void ChessController::game_loop() {
 
         }
       } else {
-
         switch (res) {
         case INVALID_MOVE:
           std::cout << "Invalid move played, try again\n";

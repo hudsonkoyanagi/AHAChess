@@ -64,6 +64,14 @@ void ChessModel::register_view(ChessView* v) {
   views.push_back(v);
 }
 
+void ChessModel::empty(){
+  for(int i = 0;i<8;i++){
+    for(int j =0;j<8;j++){
+      board[i][j]->set_empty();
+    }
+  }
+}
+
 // finds the king location
 Piece* ChessModel::find_king(COLOURS king_col) {
   for (int r = 0; r < 8; ++r) {
