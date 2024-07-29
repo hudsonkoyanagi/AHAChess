@@ -107,12 +107,12 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
       if (p->type != EMPTY && board[r][c]->col == curr_col) {
         switch (p->type) {
         case PAWN:
-          if (is_valid(Move{ Cord{r, c}, Cord{r + pawn_dir, c} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 2 * pawn_dir, c} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + pawn_dir, c - 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + pawn_dir, c + 1} }, white_to_move) != INVALID_MOVE) {
+          if (is_valid(Move{ Cord{r, c}, Cord{r + pawn_dir, c} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 2 * pawn_dir, c} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + pawn_dir, c - 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + pawn_dir, c + 1} }, white_to_move).move_result != INVALID_MOVE) {
             return false;
           }
           break;
         case KNIGHT:
-          if (is_valid(Move{ Cord{r, c}, Cord{r - 1, c + 2} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 2, c + 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 2, c - 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c - 2} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c - 2} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 2, c - 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 2, c + 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c + 2} }, white_to_move) != INVALID_MOVE) {
+          if (is_valid(Move{ Cord{r, c}, Cord{r - 1, c + 2} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 2, c + 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 2, c - 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c - 2} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c - 2} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 2, c - 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 2, c + 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c + 2} }, white_to_move).move_result != INVALID_MOVE) {
             return false;
           }
           break;
@@ -122,7 +122,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           int cc = c;
           // current row & col to top right
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             --cr;
@@ -133,7 +133,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           cc = c;
           // current row & col to top left
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             --cr;
@@ -144,7 +144,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           cc = c;
           // current row & col to bot left
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             ++cr;
@@ -155,7 +155,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           cc = c;
           // current row & col to bot right
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             ++cr;
@@ -167,13 +167,13 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
         {
           // check left to right
           for (int cc = 0; cc < 8; cc++) {
-            if (is_valid(Move{ Cord{r, c}, Cord{r, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{r, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
           }
           // check top to bot
           for (int cr = 0; cr < 8; cr++) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, c} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, c} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
           }
@@ -185,7 +185,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           int cc = c;
           // current row & col to top right
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             --cr;
@@ -196,7 +196,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           cc = c;
           // current row & col to top left
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             --cr;
@@ -207,7 +207,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           cc = c;
           // current row & col to bot left
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             ++cr;
@@ -218,7 +218,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           cc = c;
           // current row & col to bot right
           while (cr >= 0 && cc >= 0) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr, cc} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
             ++cr;
@@ -227,13 +227,13 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
 
           // check left to right
           for (int cc2 = 0; cc2 < 8; cc2++) {
-            if (is_valid(Move{ Cord{r, c}, Cord{r, cc2} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{r, cc2} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
           }
           // check top to bot
           for (int cr2 = 0; cr2 < 8; cr2++) {
-            if (is_valid(Move{ Cord{r, c}, Cord{cr2, c} }, white_to_move) != INVALID_MOVE) {
+            if (is_valid(Move{ Cord{r, c}, Cord{cr2, c} }, white_to_move).move_result != INVALID_MOVE) {
               return false;
             }
           }
@@ -241,7 +241,7 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
           break;
         }
         case KING:
-          if (is_valid(Move{ Cord{r, c}, Cord{r, c + 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c + 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c - 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r, c - 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c - 1} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c} }, white_to_move) != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c + 1} }, white_to_move) != INVALID_MOVE) {
+          if (is_valid(Move{ Cord{r, c}, Cord{r, c + 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c + 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r - 1, c - 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r, c - 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c - 1} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c} }, white_to_move).move_result != INVALID_MOVE || is_valid(Move{ Cord{r, c}, Cord{r + 1, c + 1} }, white_to_move).move_result != INVALID_MOVE) {
             return false;
           }
           break;
@@ -283,31 +283,31 @@ Piece* ChessModel::at(Cord c) const {
   return board[c.row][c.col];
 }
 
-MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
+Move ChessModel::make_move(Move m, bool white_to_move) {
   Piece* p = at(m.start);
   Piece* target = at(m.end);
 
-  MOVE_RESULTS result = is_valid(m, white_to_move);
-  if (result == INVALID_MOVE) {
-    return INVALID_MOVE;
+  Move result = is_valid(m, white_to_move);
+  if (result.move_result == INVALID_MOVE) {
+    return result;
+  }
+  result.moved = p->type;
+  result.taken = target->type;
+  result.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
+
+  if (result.check) {
+
   }
 
-  Move move_to_store{ m.start, m.end };
-  move_to_store.moved = p->type;
-  move_to_store.taken = target->type;
-  move_to_store.move_result = result;
-  move_to_store.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
-  move_to_store.move_result = result;
+  commit_move(result);
 
-  commit_move(move_to_store);
-  // check_for_checks() and handle
   // check_for_mate() and handle
   // if(m.col is in check) undo_move(); return invalid;
   // if(m.col is in checkmate) undo_move(); return invalid;
   // if(other col is in check) return OTHER_IN_CHECK;
   // if(other col is in mate) return OTHER_IN_MATE;
   std::cout << "Not finished, if you see this it's bad\n";
-  return move_to_store.move_result;
+  return result;
 }
 
 // Makes the move M, requires the move result from check validity
@@ -385,17 +385,14 @@ void ChessModel::commit_move(Move m) {
   }
 }
 
-// Pre: Start and end are both coordinates within the board
-// Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
-MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
+
+Move ChessModel::is_valid(Move m, bool white_to_move) {
   MOVE_RESULTS pre = check_pre_move(m, white_to_move);
-  if (pre == INVALID_MOVE)
-    return INVALID_MOVE;
-  // MOVE_RESULTS post = check_post_move(m,white_to_move);
-  // std::cout<<"line 205"<<std::endl;
-  // if(post == SUCCESS) return pre;
-  // std::cout << "is_valid running" << std::endl;
-  return pre;
+  m.move_result = INVALID_MOVE;
+  if (pre == INVALID_MOVE) return m;
+  Move post = check_post_move(m, white_to_move);
+  if (post.move_result == INVALID_MOVE) return post;
+  return post; // contains move result and whether theres a check
 }
 
 // Check the piecewise validity of a move without regard for checks
@@ -700,57 +697,30 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
 
 // Check the after results of a move (what's in check(mate))
 // Pre: check_pre_move has determined piecewise validity
-MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
+Move ChessModel::check_post_move(Move m, bool white_to_move) {
   commit_move(m);
+  Move to_ret = m;
 
   bool temp_white_in_check = is_in_check(WHITE);
   bool temp_black_in_check = is_in_check(BLACK);
 
   if (white_to_move) {
     if (temp_white_in_check) {
-      // undo_move();
-      return INVALID_MOVE;
+
+      to_ret.move_result = INVALID_MOVE;
     } else if (temp_black_in_check) {
       // undo_move();
-      switch (m.move_result) {
-      case SUCCESS:
-        return MOVE_WITH_CHECK;
-      case CAPTURE:
-        return CAPTURE_WITH_CHECK;
-      case PROMOTION:
-        return PROMOTE_WITH_CHECK;
-      case EN_PASSANT:
-        return EN_PASSANT;
-      case CASTLE:
-        return CASTLE_WITH_CHECK;
-      default:
-        return INVALID_MOVE;
-      }
-    } else {
-      return SUCCESS;
+      to_ret.check = true;
     }
   } else { // black to move
     if (temp_black_in_check) {
-      // undo_move();
-      return INVALID_MOVE;
+
+      to_ret.move_result = INVALID_MOVE;
     } else if (temp_white_in_check) {
-      // undo_move();
-      switch (m.move_result) {
-      case SUCCESS:
-        return MOVE_WITH_CHECK;
-      case CAPTURE:
-        return CAPTURE_WITH_CHECK;
-      case PROMOTION:
-        return PROMOTE_WITH_CHECK;
-      case EN_PASSANT:
-        return EN_PASSANT;
-      case CASTLE:
-        return CASTLE_WITH_CHECK;
-      default:
-        return INVALID_MOVE;
-      }
-    } else {
-      return SUCCESS;
+
+      to_ret.check = true;
     }
   }
+  //undo_move();
+  return to_ret;
 }
