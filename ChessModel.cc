@@ -212,6 +212,7 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
 // Check the piecewise validity of a move without regard for checks
 // Only returns SUCCESS, INVALID_MOVE, EN_PASSANT, CASTLE, CAPTURE, SUCCESS
 MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
+  if (m.start.row > 7 || m.start.row < 0 || m.end.row > 7 || m.end.row < 0 || m.start.col > 7 || m.start.col < 0 || m.end.col > 7 || m.end.col < 0) return INVALID_MOVE;
   Piece* p = at(m.start);
   Piece* target = at(m.end);
   if ((p->col == WHITE && !white_to_move) || (p->col == BLACK && white_to_move)) return INVALID_MOVE; // correct colour check
