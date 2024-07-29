@@ -11,7 +11,7 @@ struct Piece {
     bool has_moved;
     Cord loc;
 
-    Piece(char l, Cord c, COLOURS col, PIECES t, bool b =false);
+    Piece(char l =' ', Cord c=Cord{-1,-1}, COLOURS col=NONE, PIECES t=EMPTY, bool b =false);
     void set_empty();
     bool is_empty();
 
