@@ -91,7 +91,9 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   Piece* target = at(m.end);
 
   MOVE_RESULTS result = is_valid(m, white_to_move);
-  if (result == INVALID_MOVE) return INVALID_MOVE;
+  if (result == INVALID_MOVE){
+     return INVALID_MOVE;
+  }
 
   Move move_to_store{ m.start, m.end };
   move_to_store.moved = p->type;
@@ -106,7 +108,7 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   // if(m.col is in checkmate) undo_move(); return invalid;
   // if(other col is in check) return OTHER_IN_CHECK;
   // if(other col is in mate) return OTHER_IN_MATE;
-  std::cout << "Not finished, if yous ee this its bad\n";
+  std::cout << "Not finished, if you see this it's bad\n";
   return move_to_store.move_result;
 }
 
