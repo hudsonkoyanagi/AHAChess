@@ -194,9 +194,6 @@ void ChessModel::commit_move(Move m) {
   }
 }
 
-
-
-
 // Pre: Start and end are both coordinates within the board
 // Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
 MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
