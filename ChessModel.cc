@@ -87,7 +87,7 @@ bool ChessModel::is_in_check(COLOURS king_col) {
   for (int r=0;r<8;++r) {
     for (int c=0;c<8;++c) {
       if (board[r][c]->type != EMPTY && board[r][c]->col != king_col) {
-        MOVE_RESULTS r = is_valid(Move{board[r][c]->loc, k->loc}, white_to_move);
+        MOVE_RESULTS r = check_pre_move(Move{board[r][c]->loc, k->loc}, white_to_move);
         if (r == CAPTURE_WITH_CHECK || r == PROMOTE_WITH_CHECK || r == MOVE_WITH_CHECK || r == CASTLE_WITH_CHECK || r == EN_PASSANT_WITH_CHECK) {
           return true;
         }
