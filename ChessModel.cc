@@ -7,35 +7,35 @@
 
 // Inits to starting board
 ChessModel::ChessModel() : pawn_to_promote{ -1, -1 } {
-  board[0][0] = new Piece{ 'r', Cord{0, 0}, BLACK, ROOK };
-  board[0][1] = new Piece{ 'n', Cord{0, 1}, BLACK, KNIGHT };
-  board[0][2] = new Piece{ 'b', Cord{0, 2}, BLACK, BISHOP };
-  board[0][3] = new Piece{ 'q', Cord{0, 3}, BLACK, QUEEN };
-  board[0][4] = new Piece{ 'k', Cord{0, 4}, BLACK, KING };
-  board[0][5] = new Piece{ 'b', Cord{0, 5}, BLACK, BISHOP };
-  board[0][6] = new Piece{ 'n', Cord{0, 6}, BLACK, KNIGHT };
-  board[0][7] = new Piece{ 'r', Cord{0, 7}, BLACK, ROOK };
+  board[0][0] = new Piece{ Cord{0, 0}, BLACK, ROOK };
+  board[0][1] = new Piece{ Cord{0, 1}, BLACK, KNIGHT };
+  board[0][2] = new Piece{ Cord{0, 2}, BLACK, BISHOP };
+  board[0][3] = new Piece{ Cord{0, 3}, BLACK, QUEEN };
+  board[0][4] = new Piece{ Cord{0, 4}, BLACK, KING };
+  board[0][5] = new Piece{ Cord{0, 5}, BLACK, BISHOP };
+  board[0][6] = new Piece{ Cord{0, 6}, BLACK, KNIGHT };
+  board[0][7] = new Piece{ Cord{0, 7}, BLACK, ROOK };
 
   for (int i = 0; i < 8; i++)
-    board[1][i] = new Piece{ 'p', Cord{1, i}, BLACK, PAWN };
+    board[1][i] = new Piece{ Cord{1, i}, BLACK, PAWN };
 
   for (int i = 2; i <= 5; i++) {
     for (int j = 0; j < 8; j++) {
-      board[i][j] = new Piece{ ' ', Cord{i, j}, COLOURS::NONE, PIECES::EMPTY };
+      board[i][j] = new Piece{Cord{i, j}, COLOURS::NONE, PIECES::EMPTY };
     }
   }
 
   for (int i = 0; i < 8; i++)
-    board[6][i] = new Piece{ 'P', Cord{6, i}, WHITE, PAWN };
+    board[6][i] = new Piece{Cord{6, i}, WHITE, PAWN };
 
-  board[7][0] = new Piece{ 'R', Cord{7, 0}, WHITE, ROOK };
-  board[7][1] = new Piece{ 'N', Cord{7, 1}, WHITE, KNIGHT };
-  board[7][2] = new Piece{ 'B', Cord{7, 2}, WHITE, BISHOP };
-  board[7][3] = new Piece{ 'Q', Cord{7, 3}, WHITE, QUEEN };
-  board[7][4] = new Piece{ 'K', Cord{7, 4}, WHITE, KING };
-  board[7][5] = new Piece{ 'B', Cord{7, 5}, WHITE, BISHOP };
-  board[7][6] = new Piece{ 'N', Cord{7, 6}, WHITE, KNIGHT };
-  board[7][7] = new Piece{ 'R', Cord{7, 7}, WHITE, ROOK };
+  board[7][0] = new Piece{ Cord{7, 0}, WHITE, ROOK };
+  board[7][1] = new Piece{ Cord{7, 1}, WHITE, KNIGHT };
+  board[7][2] = new Piece{ Cord{7, 2}, WHITE, BISHOP };
+  board[7][3] = new Piece{ Cord{7, 3}, WHITE, QUEEN };
+  board[7][4] = new Piece{ Cord{7, 4}, WHITE, KING };
+  board[7][5] = new Piece{ Cord{7, 5}, WHITE, BISHOP };
+  board[7][6] = new Piece{ Cord{7, 6}, WHITE, KNIGHT };
+  board[7][7] = new Piece{ Cord{7, 7}, WHITE, ROOK };
 }
 
 ChessModel::~ChessModel() {
@@ -276,63 +276,63 @@ void ChessModel::undo_move() {
   COLOURS opponent_colour = (p->col == WHITE) ? BLACK : WHITE;
 
   switch (result) {
-    case SUCCESS:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      break;
-    case STALEMATE:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      break;
-    case BLACK_CHECKMATED:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      break;
-    case WHITE_CHECKMATED:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      break;
-    case CAPTURE:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      p->type = taken;
-      p->col = opponent_colour;
-      p->has_moved = m.taken_had_moved_prior;
-      break;
-    case EN_PASSANT:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      board[m.start.row][m.end.col]->type = taken;
-      board[m.start.row][m.end.col]->col = opponent_colour;
-      board[m.start.row][m.end.col]->has_moved = m.taken_had_moved_prior;
-      break;
-    case CASTLE:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      // king side castle
-      if (m.end.col > m.start.col) {
-        // if WHITE, swap rook to bot right
-        if (player_colour == WHITE) {
-          std::swap(board[7][7], board[7][5]);
-          board[7][7]->has_moved = false;
-        }
-        // otherwise, swap rook to top right
-        else {
-          std::swap(board[0][7], board[0][5]);
-          board[0][7]->has_moved = false;
-        }
+  case SUCCESS:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    break;
+  case STALEMATE:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    break;
+  case BLACK_CHECKMATED:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    break;
+  case WHITE_CHECKMATED:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    break;
+  case CAPTURE:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    p->type = taken;
+    p->col = opponent_colour;
+    p->has_moved = m.taken_had_moved_prior;
+    break;
+  case EN_PASSANT:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    board[m.start.row][m.end.col]->type = taken;
+    board[m.start.row][m.end.col]->col = opponent_colour;
+    board[m.start.row][m.end.col]->has_moved = m.taken_had_moved_prior;
+    break;
+  case CASTLE:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    // king side castle
+    if (m.end.col > m.start.col) {
+      // if WHITE, swap rook to bot right
+      if (player_colour == WHITE) {
+        std::swap(board[7][7], board[7][5]);
+        board[7][7]->has_moved = false;
       }
-      // queen side castle
+      // otherwise, swap rook to top right
       else {
-        // if WHITE, swap rook to bot left
-        if (player_colour == WHITE) {
-          std::swap(board[7][0], board[7][3]);
-          board[7][0]->has_moved = false;
-        }
-        // otherwise, swap rook to top left
-        else {
-          std::swap(board[0][0], board[0][3]);
-          board[0][0]->has_moved = false;
-        }
+        std::swap(board[0][7], board[0][5]);
+        board[0][7]->has_moved = false;
       }
-      break;
-    case PROMOTION:
-      std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-      board[m.start.row][m.start.col]->type = PAWN;
-      break;
+    }
+    // queen side castle
+    else {
+      // if WHITE, swap rook to bot left
+      if (player_colour == WHITE) {
+        std::swap(board[7][0], board[7][3]);
+        board[7][0]->has_moved = false;
+      }
+      // otherwise, swap rook to top left
+      else {
+        std::swap(board[0][0], board[0][3]);
+        board[0][0]->has_moved = false;
+      }
+    }
+    break;
+  case PROMOTION:
+    std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+    board[m.start.row][m.start.col]->type = PAWN;
+    break;
   }
 
   history.pop_back();
@@ -341,8 +341,7 @@ void ChessModel::undo_move() {
   if (m.check) {
     if (player_colour == WHITE) {
       black_in_check = false;
-    }
-    else {
+    } else {
       white_in_check = false;
     }
   }
@@ -351,8 +350,7 @@ void ChessModel::undo_move() {
     if (history.back().check) {
       if (player_colour == WHITE) {
         white_in_check = true;
-      }
-      else {
+      } else {
         black_in_check = true;
       }
     }
