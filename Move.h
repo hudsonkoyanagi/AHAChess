@@ -12,11 +12,8 @@ class Move {
     PIECES moved;
     PIECES taken;
     MOVE_RESULTS move_result;
-    bool check;
 
-    // bool castle
-    // bool capture
-    
+    bool check = false;
     
     Move(Cord s, Cord e);
 };

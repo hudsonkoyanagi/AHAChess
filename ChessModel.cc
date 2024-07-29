@@ -455,13 +455,68 @@ Piece* ChessModel::at(std::string s) {
 }
 
 MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
+  Piece* p = board[m.start.row][m.start.col];
+  Piece* target = board[m.end.row][m.end.col];
+
   MOVE_RESULTS result = is_valid(m, white_to_move);
-  // commit_move(m);
+  if(result == INVALID_MOVE) return INVALID_MOVE;
+
+  Move move_to_store{m.start, m.end};
+  move_to_store.moved = p->type;
+  move_to_store.taken = target->type;
+  move_to_store.move_result = result;
+
+  commit_move(move_to_store);
   // MOVE_RESULTS check = in_check_or_mate()
   // if(m.col is in check) undo_move(); return invalid;
   // if(m.col is in checkmate) undo_move(); return invalid;
   // if(oterh col is in check) return OTHER_IN_CHECK;
   // if(oterh col is in mate) return OTHER_IN_MATE;
+}
+
+void ChessModel::commit_move(Move m) {
+
+
+  Piece* p = board[m.start.row][m.start.col];
+  Piece* target = board[m.end.row][m.end.col];
+  switch(m.move_result) {
+    case CASTLE: // move rook
+      int row = p->col == WHITE ? 8 : 1;
+      if (m.start.col > m.start.col) { // Queen side castle
+        std::swap(board[m.start.row][3]->loc, board[m.start.row][0]->loc);
+        std::swap(board[m.start.row][3], board[m.start.row][0]);
+      } else { // King side castle
+        std::swap(board[m.start.row][5]->loc, board[m.start.row][7]->loc);
+        std::swap(board[m.start.row][5], board[m.start.row][7]);
+      }
+      do_move(m);
+      break;
+
+    case CAPTURE: // delete target - swap
+      target->set_empty(); // only difference from standard move
+      do_move(m);
+      break;
+    case SUCCESS: // just a move
+      do_move(m);
+      break;
+    
+    case PROMOTION: // get user input on piece to promote
+    
+    case EN_PASSANT: // remove other pawn
+    
+    
+    case INVALID_MOVE:
+  }
+  target->set_empty();
+  std::swap(target->loc, p->loc);
+  std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+
+
+
+  history.push_back(m);
+  p->has_moved = true;
+
+
 }
 
 

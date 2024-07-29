@@ -34,6 +34,6 @@ Move Level1::make_move(bool white_to_move){
         }
     }
     if (!valid_moves.empty()) {
-        return legal_moves[std::rand() % valid_moves.size()];
+        return valid_moves[std::rand() % valid_moves.size()];
     }
 }
