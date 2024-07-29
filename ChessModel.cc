@@ -147,8 +147,6 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   return move_to_store.move_result;
 }
 
-
-
 // Makes the move M, requires the move result from check validity
 void ChessModel::commit_move(Move m) {
   Piece* p = at(m.start);
@@ -196,10 +194,19 @@ void ChessModel::commit_move(Move m) {
   }
 }
 
+
+
+
 // Pre: Start and end are both coordinates within the board
 // Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
 MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
-  return check_pre_move(m, white_to_move);
+  MOVE_RESULTS pre = check_pre_move(m, white_to_move);
+  if(pre == INVALID_MOVE) return INVALID_MOVE;
+  MOVE_RESULTS post = check_post_move(m, white_to_move);
+  if(post == INVALID_MOVE) return INVALID_MOVE;
+
+  if(post == SUCCESS) return pre;
+  return post;
 }
 
 // Check the piecewise validity of a move without regard for checks
@@ -442,9 +449,15 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
 // Check the after results of a move (what's in check(mate))
 // Pre: check_pre_move has determined piecewise validity
 MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
+  return SUCCESS; // TODO implement
   commit_move(m);
-  if (is_white_in_check()) {
+  if (is_in_check(WHITE)) {
     if (white_to_move) return INVALID_MOVE; // white can't put itself in check
-    else return
+    
+
+  } else if(is_in_check(BLACK)) {
+
+  } else {
+    return SUCCESS;
   }
 }
