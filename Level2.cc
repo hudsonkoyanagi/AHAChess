@@ -19,18 +19,16 @@ MOVE_RESULTS Level2::make_move(bool white_to_move) {
                 for (int m = 0; m < 8;++m) {
                     for (int n = 0;n < 8;++n) {
                         std::cout << "";
-                        MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
-                        if (currMove != INVALID_MOVE) {
-                            Move mv{ Cord{i,j}, Cord{m,n} };
-                            mv.move_result = currMove;
-                            if(currMove == CAPTURE){
-                                valid_captures.push_back(mv);
-                            }
-                            else if(currMove == CAPTURE_WITH_CHECK || currMove == PROMOTE_WITH_CHECK || currMove == MOVE_WITH_CHECK || currMove  == CASTLE_WITH_CHECK || currMove == EN_PASSANT_WITH_CHECK){
-                                valid_checks.push_back(mv);
+                        // MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
+                        Move currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
+                        if (currMove.move_result != INVALID_MOVE) {
+                            if (currMove.check) {
+                                valid_checks.push_back(currMove);
+                            } else if(currMove.move_result == CAPTURE){
+                                valid_captures.push_back(currMove);
                             }
                             else{
-                                valid_moves.push_back(mv);
+                                valid_moves.push_back(currMove);
                             }
                         }
                     }
@@ -39,18 +37,14 @@ MOVE_RESULTS Level2::make_move(bool white_to_move) {
                 for (int m = 0; m < 8;++m) {
                     for (int n = 0;n < 8;++n) {
                         std::cout << "";
-                        MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
-                        if (currMove != INVALID_MOVE) {
-                            Move mv{ Cord{i,j}, Cord{m,n} };
-                            mv.move_result = currMove;
-                            if(currMove == CAPTURE){
-                                valid_captures.push_back(mv);
-                            }
-                            else if(currMove == CAPTURE_WITH_CHECK || currMove == PROMOTE_WITH_CHECK || currMove == MOVE_WITH_CHECK || currMove  == CASTLE_WITH_CHECK || currMove == EN_PASSANT_WITH_CHECK){
-                                valid_checks.push_back(mv);
-                            }
-                            else{
-                                valid_moves.push_back(mv);
+                        Move currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
+                        if (currMove.move_result != INVALID_MOVE) {
+                            if (currMove.check) {
+                                valid_checks.push_back(currMove);
+                            } else if (currMove.move_result == CAPTURE) {
+                                valid_captures.push_back(currMove);
+                            } else {
+                                valid_moves.push_back(currMove);
                             }
                         }
                     }
