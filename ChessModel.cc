@@ -96,6 +96,163 @@ bool ChessModel::is_in_check(COLOURS king_col) {
   }
 }
 
+// checks if one side is currently in stalemate
+bool ChessModel::is_stalemate_for(COLOURS curr_col) {
+  bool white_to_move = (curr_col == WHITE) ? true : false;
+  int pawn_dir = (curr_col == WHITE) ? -1 : 1;
+
+  for (int r=0;r<8;++r) {
+    for (int c=0;c<8;++c) {
+      Piece* p = board[r][c];
+      if (p->type != EMPTY && board[r][c]->col == curr_col) {
+        switch (p->type) {
+          case PAWN:
+            if (is_valid(Move{Cord{r, c}, Cord{r + pawn_dir, c}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r + 2*pawn_dir, c}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r + pawn_dir, c - 1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r + pawn_dir, c + 1}}, white_to_move) != INVALID_MOVE) {
+              return false;
+            }
+            break;
+          case KNIGHT:
+            if (is_valid(Move{Cord{r, c}, Cord{r-1, c+2}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r-2, c+1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r-2, c-1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r-1, c-2}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+1, c-2}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+2, c-1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+2, c+1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+1, c+2}}, white_to_move) != INVALID_MOVE) {
+              return false;
+            }
+            break;
+          case BISHOP:
+          {
+            int cr = r;
+            int cc = c;
+            // current row & col to top right
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              --cr;
+              ++cc;
+            }
+
+            cr = r;
+            cc = c;
+            // current row & col to top left
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              --cr;
+              --cc;
+            }
+
+            cr = r;
+            cc = c;
+            // current row & col to bot left
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              ++cr;
+              --cc;
+            }
+
+            cr = r;
+            cc = c;
+            // current row & col to bot right
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              ++cr;
+              ++cc;
+            }
+            break;
+          }
+          case ROOK:
+          {
+            // check left to right
+            for (int cc=0;cc<8;cc++) {
+              if (is_valid(Move{Cord{r, c}, Cord{r, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+            }
+            // check top to bot
+            for (int cr=0;cr<8;cr++) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, c}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+            }
+            break;
+          }
+          case QUEEN:
+          {
+            int cr = r;
+            int cc = c;
+            // current row & col to top right
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              --cr;
+              ++cc;
+            }
+
+            cr = r;
+            cc = c;
+            // current row & col to top left
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              --cr;
+              --cc;
+            }
+
+            cr = r;
+            cc = c;
+            // current row & col to bot left
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              ++cr;
+              --cc;
+            }
+
+            cr = r;
+            cc = c;
+            // current row & col to bot right
+            while (cr >= 0 && cc >=0) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr, cc}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+              ++cr;
+              ++cc;
+            }
+
+            // check left to right
+            for (int cc2=0;cc2<8;cc2++) {
+              if (is_valid(Move{Cord{r, c}, Cord{r, cc2}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+            }
+            // check top to bot
+            for (int cr2=0;cr2<8;cr2++) {
+              if (is_valid(Move{Cord{r, c}, Cord{cr2, c}}, white_to_move) != INVALID_MOVE) {
+                return false;
+              }
+            }
+            
+            break;
+          }
+          case KING:
+            if (is_valid(Move{Cord{r, c}, Cord{r, c+1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r-1, c+1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r-1, c}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r-1, c-1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r, c-1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+1, c-1}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+1, c}}, white_to_move) != INVALID_MOVE || is_valid(Move{Cord{r, c}, Cord{r+1, c+1}}, white_to_move) != INVALID_MOVE) {
+              return false;
+            }
+            break;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 // Swaps pieces at start and end
 void ChessModel::do_move(Move m) {
   Piece* p = at(m.start);
