@@ -117,6 +117,10 @@ Piece* ChessModel::at(std::string s) const {
 }
 
 Piece* ChessModel::at(Cord c) const {
+  if(c.col > 7 || c.col <0 || c.row > 7 || c.row <0) {
+    std::cout << "FUCKED CORD\n";
+    return nullptr;
+  }
   return board[c.row][c.col];
 }
 
@@ -509,4 +513,9 @@ MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
     }
   }
   return INVALID_MOVE;
+}
+
+
+void ChessModel::undo_move() {
+  Move last_move = history[history.size()-1];
 }
