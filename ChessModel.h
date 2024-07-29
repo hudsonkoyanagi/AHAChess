@@ -32,7 +32,7 @@ public:
 
     void reset();
     void empty();
-    
+
     MOVE_RESULTS is_valid(Move m, bool white_to_move) const;
     MOVE_RESULTS make_move(Move m, bool white_to_move);
     void commit_move(Move m);
@@ -49,7 +49,9 @@ public:
     bool setup_finish(); // returns false if setup cannot be finished (invalid pawns, kings, etc)
 
 
+    // helpers
     Piece* at(std::string s) const; // returns piece at cord string or nullptr if invalid
+    Piece* at(Cord c) const; // returns piece at cord string or nullptr if invalid
 
 
     void notify_views();
