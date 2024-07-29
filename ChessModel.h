@@ -34,7 +34,7 @@ public:
     void empty();
 
     Piece* find_king(COLOURS king_col);      // finds the piece of the white king
-    bool check_exists(COLOURS king_col);     // checks if any piece is putting a king in check (param=true for search white, param=false for search black)
+    bool is_in_check(COLOURS king_col);     // checks if any piece is putting a king in check (param=true for search white, param=false for search black)
 
     MOVE_RESULTS is_valid(Move m, bool white_to_move) const;
     MOVE_RESULTS make_move(Move m, bool white_to_move);

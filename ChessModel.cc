@@ -79,7 +79,7 @@ Piece* ChessModel::find_king(COLOURS king_col) {
 }
 
 // checking if the board has any checks
-bool ChessModel::check_exists(COLOURS king_col) {
+bool ChessModel::is_in_check(COLOURS king_col) {
   bool white_to_move = (king_col == WHITE) ? false : true;  // if we are checking the WHITE king, check as if it's a BLACK move, and vice versa
 
   Piece* k = find_king(king_col);
