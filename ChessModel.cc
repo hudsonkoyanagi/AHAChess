@@ -343,9 +343,32 @@ void ChessModel::commit_move(Move m) {
 
   case PROMOTION:
   { // get user input on piece to promote
-    // TODO: handle promotion user input
-    pawn_to_promote = m.start; // now go get user input come back do promotion and check for checks
-
+    while (p->type == PAWN) {
+      std::cout << "Enter piece to promote: ";
+      char pie;
+      std::cin >> pie;
+      switch (pie) {
+      case 'Q':
+      case 'q':
+        p->type = QUEEN;
+        break;
+      case 'R':
+      case 'r':
+        p->type = ROOK;
+        break;
+      case 'B':
+      case 'b':
+        p->type = BISHOP;
+        break;
+      case 'N':
+      case 'n':
+        p->type = KNIGHT;
+        break;
+      default:
+        std::cout << "\nInvalid piece to promote to. Try again.\n";
+      }
+    }
+    do_move(m);
     break;
   }
   case EN_PASSANT:
