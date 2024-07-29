@@ -73,6 +73,7 @@ public:
     friend class Level2;
     friend class Level3;
     friend class Level4;
-};
+    friend class ChessController;
+};  
 
 #endif

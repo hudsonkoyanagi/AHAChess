@@ -80,5 +80,5 @@ char piece_col_to_char(PIECES p, COLOURS c) {
 
     if(p != EMPTY && c == WHITE) ch -= 32;
     return ch;
-    
+
 }

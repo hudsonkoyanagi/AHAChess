@@ -17,6 +17,7 @@ public:
     void input_loop();
     void game_loop();
     void setup_loop();
+    bool isValidBoard();
 
     ChessController(ChessModel* m) : model{m} {}
 };
