@@ -98,6 +98,7 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   move_to_store.taken = target->type;
   move_to_store.move_result = result;
   move_to_store.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
+  move_to_store.move_result = result;
 
   commit_move(move_to_store);
   // check_for_checks() and handle
