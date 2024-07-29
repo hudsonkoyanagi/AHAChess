@@ -37,8 +37,9 @@ public:
     bool is_in_check(COLOURS king_col);     // checks if any piece is putting a king in check (param=true for search white, param=false for search black)
 
     bool is_stalemate_for(COLOURS curr_col);    // checks if WHITE or BLACK is in stalemate
+    bool is_checkmate_for(COLOURS curr_col);    // checks if WHITE or BLACK is in checkmate
 
-    Move is_valid(Move m, bool white_to_move) ;
+    Move is_valid(Move m, bool white_to_move);
     Move make_move(Move m, bool white_to_move);
     void commit_move(Move m);
     void do_move(Move m);       // Actually updates board state
