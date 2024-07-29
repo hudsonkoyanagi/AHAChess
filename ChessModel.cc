@@ -390,17 +390,32 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
   result.moved = p->type;
   result.taken = target->type;
   result.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
-
-  if (result.check) {
-
-  }
+  result.taken_had_moved_prior = target->has_moved;
 
   commit_move(result);
 
-  // check_for_mate() and handle
-  // if(m.col is in check) undo_move(); return invalid;
-  // if(m.col is in checkmate) undo_move(); return invalid;
-  // if(other col is in check) return OTHER_IN_CHECK;
+  if (result.check) {
+    if(white_to_move) {
+      // check_for_mate() and handle
+      black_in_check = true;
+      white_in_check = false;
+    }
+    else {
+      // check_for_mate() and handle
+      black_in_check =false;
+      white_in_check = true;
+    }
+  }
+
+
+
+  if(is_stalemate_for(BLACK)) {
+    result.move_result = STALEMATE;
+  }
+
+  
+
+
   // if(other col is in mate) return OTHER_IN_MATE;
   std::cout << "Not finished, if you see this it's bad\n";
   return result;
@@ -802,21 +817,18 @@ Move ChessModel::check_post_move(Move m, bool white_to_move) {
 
   if (white_to_move) {
     if (temp_white_in_check) {
-
       to_ret.move_result = INVALID_MOVE;
     } else if (temp_black_in_check) {
-      // undo_move();
       to_ret.check = true;
     }
   } else { // black to move
     if (temp_black_in_check) {
-
       to_ret.move_result = INVALID_MOVE;
     } else if (temp_white_in_check) {
 
       to_ret.check = true;
     }
   }
-  //undo_move();
+  undo_move();
   return to_ret;
 }
