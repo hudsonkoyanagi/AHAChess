@@ -5,7 +5,7 @@ class Cord {
 public:
     int row;
     int col;
-    Cord(int r, int c) : row{r}, col{c} {}
+    Cord(int r=-1, int c=-1) : row{r}, col{c} {}
 };
 
 #endif
