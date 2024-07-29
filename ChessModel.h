@@ -36,20 +36,23 @@ public:
     Piece* find_king(COLOURS king_col);      // finds the piece of the white king
     bool is_in_check(COLOURS king_col);     // checks if any piece is putting a king in check (param=true for search white, param=false for search black)
 
-    MOVE_RESULTS is_valid(Move m, bool white_to_move) const;
+    MOVE_RESULTS is_valid(Move m, bool white_to_move) ;
     MOVE_RESULTS make_move(Move m, bool white_to_move);
     void commit_move(Move m);
     void do_move(Move m);       // Actually updates board state
     void do_capture(Move m);    // Updates board and erases piece at m.end
 
-    MOVE_RESULTS check_for_mate() const;
-    MOVE_RESULTS check_for_checks() const;
+    MOVE_RESULTS check_for_mate() ;
+    MOVE_RESULTS check_for_checks() ;
 
     void setup_start(); // empties board
     void setup_add_piece(char piece, Cord move);
     void setup_rem_piece(Cord move);
     void setup_set_turn(COLOURS col);
     bool setup_finish(); // returns false if setup cannot be finished (invalid pawns, kings, etc)
+
+    MOVE_RESULTS check_pre_move(Move m, bool white_to_move);
+    MOVE_RESULTS check_post_move(Move m, bool white_to_move);
 
 
     // helpers

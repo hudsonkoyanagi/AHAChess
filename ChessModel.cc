@@ -147,6 +147,8 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   return move_to_store.move_result;
 }
 
+
+
 // Makes the move M, requires the move result from check validity
 void ChessModel::commit_move(Move m) {
   Piece* p = at(m.start);
@@ -196,7 +198,13 @@ void ChessModel::commit_move(Move m) {
 
 // Pre: Start and end are both coordinates within the board
 // Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
-MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
+MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
+  return check_pre_move(m, white_to_move);
+}
+
+// Check the piecewise validity of a move without regard for checks
+// Only returns SUCCESS, INVALID_MOVE, EN_PASSANT, CASTLE, CAPTURE, SUCCESS
+MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
   Piece* p = at(m.start);
   Piece* target = at(m.end);
   if ((p->col == WHITE && !white_to_move) || (p->col == BLACK && white_to_move)) return INVALID_MOVE; // correct colour check
@@ -227,14 +235,14 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
 
             return INVALID_MOVE;
           }
-          if (abs(last_move.start.row - last_move.end.row) != 2){
+          if (abs(last_move.start.row - last_move.end.row) != 2) {
 
             return INVALID_MOVE;
-          } 
-          if (last_move.start.col != last_move.end.col || last_move.start.col != m.end.col){
+          }
+          if (last_move.start.col != last_move.end.col || last_move.start.col != m.end.col) {
 
             return INVALID_MOVE;
-          } 
+          }
           return EN_PASSANT;
         }
         return INVALID_MOVE;
@@ -431,3 +439,12 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
   return SUCCESS;
 }
 
+// Check the after results of a move (what's in check(mate))
+// Pre: check_pre_move has determined piecewise validity
+MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
+  commit_move(m);
+  if (is_white_in_check()) {
+    if (white_to_move) return INVALID_MOVE; // white can't put itself in check
+    else return
+  }
+}
