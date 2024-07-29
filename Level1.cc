@@ -17,9 +17,11 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
                 for (int m = 0; m < 8;++m) {
                     for (int n = 0;n < 8;++n) {
                         std::cout << "";
-                        MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move);
+                        // std::cout<<"Are you running"<<std::endl;
+                        MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n}}, white_to_move);
                         if (currMove != INVALID_MOVE) {
-                            Move mv{ Cord{i,j}, Cord{m,n} };
+                            // std::cout<<"Are you running"<<std::endl;
+                            Move mv{Cord{i,j},Cord{m,n}};
                             mv.move_result = currMove;
                             valid_moves.push_back(mv);
                         }
@@ -39,6 +41,10 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
                 }
             }
         }
+    }
+    std::cout<<"valid_moves"<<std::endl;
+    for(int i = 0;i<valid_moves.size();i++){
+        std::cout<<valid_moves[i].move_result<<std::endl;
     }
     if (!valid_moves.empty()) {
         Move m = valid_moves[std::rand() % valid_moves.size()];

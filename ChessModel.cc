@@ -64,8 +64,8 @@ void ChessModel::register_view(ChessView* v) {
 
 // finds the king location
 Piece* ChessModel::find_king(COLOURS king_col) {
-  for (int r=0;r<8;++r) {
-    for (int c=0;c<8;++c) {
+  for (int r = 0;r < 8;++r) {
+    for (int c = 0;c < 8;++c) {
       if (board[r][c]->type == KING) {
         if (king_col == WHITE && board[r][c]->col == WHITE) {
           return board[r][c];
@@ -84,10 +84,10 @@ bool ChessModel::is_in_check(COLOURS king_col) {
 
   Piece* k = find_king(king_col);
 
-  for (int r=0;r<8;++r) {
-    for (int c=0;c<8;++c) {
+  for (int r = 0;r < 8;++r) {
+    for (int c = 0;c < 8;++c) {
       if (board[r][c]->type != EMPTY && board[r][c]->col != king_col) {
-        MOVE_RESULTS r = is_valid(Move{board[r][c]->loc, k->loc}, white_to_move);
+        MOVE_RESULTS r = check_pre_move(Move{ board[r][c]->loc, k->loc }, white_to_move);
         if (r == CAPTURE_WITH_CHECK || r == PROMOTE_WITH_CHECK || r == MOVE_WITH_CHECK || r == CASTLE_WITH_CHECK || r == EN_PASSANT_WITH_CHECK) {
           return true;
         }
@@ -272,6 +272,10 @@ Piece* ChessModel::at(std::string s) const {
 }
 
 Piece* ChessModel::at(Cord c) const {
+  if(c.col > 7 || c.col <0 || c.row > 7 || c.row <0) {
+    std::cout << "FUCKED CORD\n";
+    return nullptr;
+  }
   return board[c.row][c.col];
 }
 
@@ -280,8 +284,8 @@ MOVE_RESULTS ChessModel::make_move(Move m, bool white_to_move) {
   Piece* target = at(m.end);
 
   MOVE_RESULTS result = is_valid(m, white_to_move);
-  if (result == INVALID_MOVE){
-     return INVALID_MOVE;
+  if (result == INVALID_MOVE) {
+    return INVALID_MOVE;
   }
 
   Move move_to_store{ m.start, m.end };
@@ -349,18 +353,15 @@ void ChessModel::commit_move(Move m) {
   }
 }
 
-
-
-
 // Pre: Start and end are both coordinates within the board
 // Asserts the validity of a move and returns the result of a move barring check(mate)s without making it
 MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
   MOVE_RESULTS pre = check_pre_move(m, white_to_move);
-  if(pre == INVALID_MOVE) return INVALID_MOVE;
-  MOVE_RESULTS post = check_post_move(m, white_to_move);
-  if(post == INVALID_MOVE) return INVALID_MOVE;
-
+  if (pre == INVALID_MOVE) return INVALID_MOVE;
+  MOVE_RESULTS post = check_post_move(m,white_to_move);
+  std::cout<<"line 205"<<std::endl;
   if(post == SUCCESS) return pre;
+  std::cout<<"is_valid running"<<std::endl;
   return post;
 }
 
@@ -605,19 +606,291 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
 // Check the after results of a move (what's in check(mate))
 // Pre: check_pre_move has determined piecewise validity
 MOVE_RESULTS ChessModel::check_post_move(Move m, bool white_to_move) {
-  return SUCCESS; // TODO implement
   commit_move(m);
-  if (is_in_check(WHITE)) {
-    if (white_to_move){
-      undo_move(m);
-      return INVALID_MOVE; // white can't put itself in check
-    } 
-  } else if(is_in_check(BLACK)) {
-      if(!white_to_move){
-        undo_move(m);
+
+  bool temp_white_in_check = is_in_check(WHITE);
+  bool temp_black_in_check = is_in_check(BLACK);
+
+  if (white_to_move) {
+    if (temp_white_in_check) {
+      undo_move();
+      return INVALID_MOVE;
+    } else if (temp_black_in_check) {
+      undo_move();
+      switch (m.move_result) {
+      case SUCCESS:
+        return MOVE_WITH_CHECK;
+      case CAPTURE:
+        return CAPTURE_WITH_CHECK;
+      case PROMOTION:
+        return PROMOTE_WITH_CHECK;
+      case EN_PASSANT:
+        return EN_PASSANT;
+      case CASTLE:
+        return CASTLE_WITH_CHECK;
+      default:
         return INVALID_MOVE;
-      } 
-  } else {
-    return SUCCESS;
+      }
+    } else {
+      return SUCCESS;
+    }
+  } else { // black to move
+    if (temp_black_in_check) {
+      undo_move();
+      return INVALID_MOVE;
+    } else if (temp_white_in_check) {
+      undo_move();
+      switch (m.move_result) {
+      case SUCCESS:
+        return MOVE_WITH_CHECK;
+      case CAPTURE:
+        return CAPTURE_WITH_CHECK;
+      case PROMOTION:
+        return PROMOTE_WITH_CHECK;
+      case EN_PASSANT:
+        return EN_PASSANT;
+      case CASTLE:
+        return CASTLE_WITH_CHECK;
+      default:
+        return INVALID_MOVE;
+      }
+    } else {
+      return SUCCESS;
+    }
   }
 }
+
+// MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) {
+//   Piece* p = at(m.start);
+//   Piece* target = at(m.end);
+//   if ((p->col == WHITE && !white_to_move) || (p->col == BLACK && white_to_move)) return INVALID_MOVE; // correct colour check
+//   if (m.start.row == m.end.row && m.start.col == m.end.col) return INVALID_MOVE; // piece must move
+
+//   switch (p->type) {
+//   case PAWN: {
+//     if (m.start.col != m.end.col) { // capture/en pesant
+//       if (abs(m.start.row - m.end.row) != 1) return INVALID_MOVE; // move one forward
+//       if (abs(m.start.col - m.end.col) != 1) return INVALID_MOVE; // move one sideways
+//       if ((p->col == WHITE) && (m.start.row <= m.end.row)) return INVALID_MOVE; // backwards move
+//       if ((p->col == BLACK) && (m.start.row >= m.end.row)) return INVALID_MOVE; // backwards move
+//       if (target->col == p->col) return INVALID_MOVE; // same colour capture
+//       if (target->type == KING) return INVALID_MOVE;  // can't capture king (TODO game should be over here anyway)
+//       if (target->type != EMPTY) {
+//         return CAPTURE;
+//       }
+
+//       if (target->type == EMPTY) {
+
+//         // both pawns are on the same row but adjacent columns
+//         Piece* other_pawn = board[m.start.row][m.end.col];
+
+//         if (other_pawn->type == PAWN && other_pawn->col != p->col) {
+//           // last move must be other pawn moving two forward
+//           Move last_move = history[history.size() - 1];
+//           if (last_move.moved != PAWN) {
+
+//             return INVALID_MOVE;
+//           }
+//           if (abs(last_move.start.row - last_move.end.row) != 2){
+
+//             return INVALID_MOVE;
+//           } 
+//           if (last_move.start.col != last_move.end.col || last_move.start.col != m.end.col){
+
+//             return INVALID_MOVE;
+//           } 
+//           return EN_PASSANT;
+//         }
+//         return INVALID_MOVE;
+//       }
+//     }
+//     if (abs(m.start.row - m.end.row) == 2) { // starting square 
+//       if ((p->col == WHITE) && (m.start.row != 6) && (m.end.row != 4)) return INVALID_MOVE; // must be on starting square
+//       if ((p->col == BLACK) && (m.start.row != 1) && (m.end.row != 3)) return INVALID_MOVE; // must be on starting square
+
+//       if (target->type != EMPTY) return INVALID_MOVE; // blocked
+//       if ((p->col == WHITE) && (board[5][m.start.col]->type != EMPTY)) return INVALID_MOVE; // blocked
+//       if ((p->col == BLACK) && (board[2][m.start.col]->type != EMPTY)) return INVALID_MOVE; // blocked
+//       return SUCCESS;
+//     }
+
+//     if (abs(m.start.row - m.end.row) == 1) { // forward move, possibly promotion
+//       if ((p->col == WHITE) && (m.start.row <= m.end.row)) return INVALID_MOVE;
+//       if ((p->col == BLACK) && (m.start.row >= m.end.row)) return INVALID_MOVE;
+//       if (target->type != EMPTY) return INVALID_MOVE;
+//       return SUCCESS;
+//     }
+
+//     return INVALID_MOVE;
+//   }
+//   case KING: {
+//     // if moving 2 columnwise, then must be a castle
+//     if (abs(m.end.row - m.start.row) == 0 && abs(m.end.col - m.start.col) == 2) {
+//       if (p->has_moved) return INVALID_MOVE; // king can't have moved
+
+//       Piece* should_be_rook;
+//       int row = 0; // chess notation row not index
+//       if (p->col == WHITE) {
+//         row = 1;
+//         if (m.start.col > m.start.col) should_be_rook = at("a1");
+//         if (m.start.col < m.start.col) should_be_rook = at("h1");
+//       } else { // BLACK
+//         row = 8;
+//         if (m.start.col > m.start.col) should_be_rook = at("a8");
+//         if (m.start.col < m.start.col) should_be_rook = at("h8");
+//       }
+
+//       if (should_be_rook->col != p->col) return INVALID_MOVE;
+//       if (should_be_rook->type != ROOK) return INVALID_MOVE;
+//       if (should_be_rook->has_moved)    return INVALID_MOVE;
+
+//       if (m.start.col > m.start.col) { // Queen side castle
+//         if (!(at("b" + row)->is_empty()) || !(at("c" + row)->is_empty()) || !(at("d" + row)->is_empty())) return INVALID_MOVE;
+//       } else { // King side castle
+//         if (!(at("f" + row)->is_empty()) || !(at("g" + row)->is_empty())) return INVALID_MOVE;
+//       }
+//       return CASTLE;
+//     }
+
+//     // if moving in a direction not 1 or 0, then invalid
+//     else if (abs(m.end.row - m.start.row) <= 1 && abs(m.end.col - m.start.col) <= 1) {
+//       if (!(target->type == EMPTY)) {
+//         if (target->col == p->col) return INVALID_MOVE; // can't capture own piece
+//         return CAPTURE;
+//       } else {
+//         return SUCCESS;
+//       }
+//     }
+//     return INVALID_MOVE;
+//   }
+//   case KNIGHT: {
+//     // either the row differs by 1 and the col differs by 2, or the row differs by 2 and the col differs by 1
+//     if (!((abs(m.end.row - m.start.row) == 1 && abs(m.end.col - m.start.col) == 2) || abs(m.end.row - m.start.row) == 2 && abs(m.end.col - m.start.col) == 1)) return INVALID_MOVE;
+
+//     if (target->type == EMPTY) {
+//       return SUCCESS;
+//     }
+//     if (target->col == p->col) return INVALID_MOVE; // can't capture same col piece
+//     return CAPTURE;
+//   }
+//   case BISHOP: {
+
+//     // if the change in row is not the same as the change in col, then it is invalid
+//     if (!(abs(m.end.row - m.start.row) == abs(m.end.col - m.start.col))) return INVALID_MOVE;
+
+//     // check if the path to that spot is clear
+//     int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+//     int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+//     int curr_row = m.start.row + row_inc;
+//     int curr_col = m.start.col + col_inc;
+//     while (curr_row != m.end.row) {
+//       // if there is anything between them, it is an invalid move
+//       if (board[curr_row][curr_col]->type != EMPTY) return INVALID_MOVE;
+//       curr_row += row_inc;
+//       curr_col += col_inc;
+//     }
+
+//     if (target->type == EMPTY) {
+//       return SUCCESS;
+//     }
+//     if (target->col == p->col) return INVALID_MOVE; // can't capture same col piece
+//     return CAPTURE;
+//   }
+//   case ROOK: {
+
+//     // if both the row and the col don't remain the same it is invalid
+//     if (!(m.start.row == m.end.row || m.start.col == m.end.col)) return INVALID_MOVE;
+
+//     // check if the path to that spot is clear
+//     if (m.start.row == m.end.row) {
+//       // if the row stays the same, it moves along the column
+//       int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+//       int curr_col = m.start.col + col_inc;
+//       while (curr_col != m.end.col) {
+//         // if there is anything between them, it is an invalid move
+//         if (board[m.start.row][curr_col]->type != EMPTY) return INVALID_MOVE;
+//         curr_col += col_inc;
+//       }
+//     } else {
+//       // otherwise, it moves along the row
+//       int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+//       int curr_row = m.start.row + row_inc;
+//       while (curr_row != m.end.row) {
+//         // if there is anything between them, it is an invalid move
+//         if (board[curr_row][m.start.col]->type != EMPTY) return INVALID_MOVE;
+//         curr_row += row_inc;
+//       }
+//     }
+
+//     if (target->type == EMPTY) return SUCCESS;
+
+//     if (target->col == p->col) return INVALID_MOVE; // can't capture same col piece
+//     return CAPTURE;
+//   }
+//   case QUEEN: {// TODO seperate out rook/bishop logic?
+
+//     // bishop logic
+//     if (abs(m.end.row - m.start.row) == abs(m.end.col - m.start.col)) {
+//       // check if target is same colour
+//       if (target->col == p->col) return INVALID_MOVE;
+
+//       // check if the path to that spot is clear
+//       int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+//       int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+//       int curr_row = m.start.row + row_inc;
+//       int curr_col = m.start.col + col_inc;
+//       while (curr_row != m.end.row) {
+//         // if there is anything between them, it is an invalid move
+//         if (board[curr_row][curr_col]->type != EMPTY) return INVALID_MOVE;
+//         curr_row += row_inc;
+//         curr_col += col_inc;
+//       }
+
+//       if (target->type != EMPTY) {
+//         return CAPTURE;
+//       } else {
+//         return SUCCESS;
+//       }
+//     }
+//     // rook logic
+//     else if (m.start.row == m.end.row || m.start.col == m.end.col) {
+//       // check if target is same colour
+//       if (target->col == p->col) return INVALID_MOVE;
+
+//       // check if the path to that spot is clear
+//       if (m.start.row == m.end.row) {
+//         // if the row stays the same, it moves along the column
+//         int col_inc = (m.end.col - m.start.col) / abs(m.end.col - m.start.col); // +1 or -1, depending on direction of movement
+//         int curr_col = m.start.col + col_inc;
+//         while (curr_col != m.end.col) {
+//           // if there is anything between them, it is an invalid move
+//           if (board[m.start.row][curr_col]->type != EMPTY) return INVALID_MOVE;
+//           curr_col += col_inc;
+//         }
+//       } else {
+//         // otherwise, it moves along the row
+//         int row_inc = (m.end.row - m.start.row) / abs(m.end.row - m.start.row); // +1 or -1, depending on direction of movement
+//         int curr_row = m.start.row + row_inc;
+//         while (curr_row != m.end.row) {
+//           // if there is anything between them, it is an invalid move
+//           if (board[curr_row][m.start.col]->type != EMPTY) return INVALID_MOVE;
+//           curr_row += row_inc;
+//         }
+//       }
+
+//       if (target->type != EMPTY) {
+//         return CAPTURE;
+//       } else {
+//         return SUCCESS;
+//       }
+//     } else {
+//       return INVALID_MOVE;
+//     }
+//   }
+//   default: {
+//     std::cout << "Not implemented yet, ignoring move";
+//     return INVALID_MOVE;
+//   }
+//   }
+//   return SUCCESS;
+// }
