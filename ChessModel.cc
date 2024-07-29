@@ -48,7 +48,9 @@ ChessModel::~ChessModel() {
     delete p;
 }
 
-void ChessModel::setup_start() {}
+void ChessModel::setup_start() {
+  
+}
 
 void ChessModel::notify_views() {
   for (auto v : views) {

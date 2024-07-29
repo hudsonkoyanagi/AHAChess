@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "Level1.h"
 #include "Level2.h"
+#include "Enums.h"
 // #include "Level3.h"
 // #include "Level4.h"
 
@@ -14,6 +15,33 @@
 bool is_valid_computer(const std::string& s) {
   return s.length() == 9 && s.substr(0, 8) == "computer" && '1' <= s[8] &&
     s[8] <= '4';
+}
+
+bool ChessController::isValidBoard(){
+// you must verify that the board contains exactly one white king and exactly one black
+// king; that no pawns are on the first or last row of the board; and that neither king is in check. 
+int whiteKingCount = 0;
+int blackKingCount = 0;
+
+  for(int i = 0;i<8;i++){
+    for(int j = 0;j<8;j++){
+      if(i == 0 || i == 7){
+        if(model->board[i][j]->type == PAWN){
+          return false;
+        }
+      }
+      if(model->board[i][j]->type == KING && model->board[i][j]->col == WHITE){
+        whiteKingCount++;
+      }
+      if(model->board[i][j]->type == KING && model->board[i][j]->col == BLACK){
+        blackKingCount++;
+      }
+    }
+  }
+  if(whiteKingCount>1 || blackKingCount >1){
+    return false;
+  }
+  return true;
 }
 
 void ChessController::input_loop() {
@@ -103,9 +131,13 @@ void ChessController::input_loop() {
       if (p1_good && p2_good) game_loop();
     } else if (command == "setup") {
       setup_loop();
-      // setup_loop
-      std::cout << "Not implemented\n";
-      exit(1);
+      if(isValidBoard()){
+        input_loop();
+      }
+      else{
+        std::cout<<"Try again, the setup conditions are invalid"<<std::endl;
+        setup_loop();
+      }
     } else {
       std::cout << "Invalid command: " << command << ". Please try again. \n";
     }
@@ -175,4 +207,87 @@ void ChessController::game_loop() {
   }
 }
 
-void ChessController::setup_loop() { model->setup_start(); }
+void ChessController::setup_loop() { 
+  std::cout<<"In setup mode"<<std::endl;
+  std::string command;
+  char piece; 
+  std::string pos;
+  std::string colour;
+  while(std::cin>>command){
+    if(command == "+"){
+      std::cin>>piece;
+      std::cin>>pos;
+      if(!is_valid_cord(pos)){
+        std::cout<<"invalid coord"<<std::endl;
+        continue;
+      }
+      Cord currPos = str_to_cord(pos);
+      switch(piece){
+        case 'P':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,PAWN};
+          break;
+        case 'R':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,ROOK};
+          break;
+        case 'N':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,KNIGHT};
+          break;
+        case 'B':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,BISHOP};
+          break;
+        case 'Q':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,QUEEN};
+          break;
+        case 'K':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,KING};
+          break;
+        case 'p':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,PAWN};
+          break;
+        case 'r':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,ROOK};
+          break;
+        case 'n':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,KNIGHT};
+          break;
+        case 'b':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,BISHOP};
+          break;
+        case 'q':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,QUEEN};
+          break;
+        case 'k':
+          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,KING};
+          break;
+        default:
+          std::cout<<"Invalid piece entered"<<std::endl;
+          continue;
+      }
+    }
+    else if(command == "-"){
+      std::cin>>pos;
+      if(!is_valid_cord(pos)){
+        std::cout<<"invalid coord"<<std::endl;
+        continue;
+      }
+      Cord currPos = str_to_cord(pos);
+      model->board[currPos.row][currPos.col]->set_empty();
+    }
+    else if(command == "="){
+      std::cin>>colour;
+      if(colour == "black"){
+        white_to_move = false;
+      }
+      else if(colour == "white"){
+        white_to_move = true;
+      }
+      else{
+        std::cout << "Invalid input.";
+        continue;
+      }
+    }
+    else if(command == "done"){
+      return;
+    }
+  }
+ }

@@ -66,3 +66,4 @@ void printPiece(PIECES piece) {
     }
     std::cout << std::endl;
 }
+
