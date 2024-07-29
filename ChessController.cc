@@ -129,8 +129,7 @@ void ChessController::game_loop() {
           std::cout << "Invalid chess coordinates, try again\n";
         }
       }
-      MOVE_RESULTS res =
-          model->make_move(Move{str_to_cord(start), str_to_cord(end)}, white_to_move);
+      MOVE_RESULTS res = model->make_move(Move{str_to_cord(start), str_to_cord(end)}, white_to_move);
       switch (res) {
         case INVALID_MOVE:
           std::cout << "Invalid move played, try again\n";

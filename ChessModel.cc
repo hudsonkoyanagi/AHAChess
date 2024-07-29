@@ -162,7 +162,7 @@ MOVE_RESULTS ChessModel::is_valid(Move m, bool white_to_move) const {
   Piece* p = at(m.start);
   Piece* target = at(m.end);
   if ((p->col == WHITE && !white_to_move) || (p->col == BLACK && white_to_move)) return INVALID_MOVE; // correct colour check
-  if (!(m.start.row == m.end.row || m.start.col == m.end.col)) return INVALID_MOVE; // piece must move
+  if (m.start.row == m.end.row && m.start.col == m.end.col) return INVALID_MOVE; // piece must move
 
   switch (p->type) {
   case PAWN: {
