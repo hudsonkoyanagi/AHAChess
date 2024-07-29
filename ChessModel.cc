@@ -249,6 +249,8 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
       }
     }
   }
+
+  return true;
 }
 
 // Swaps pieces at start and end
