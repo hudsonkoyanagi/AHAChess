@@ -22,7 +22,6 @@ bool ChessController::isValidBoard(){
 // king; that no pawns are on the first or last row of the board; and that neither king is in check. 
 int whiteKingCount = 0;
 int blackKingCount = 0;
-
   for(int i = 0;i<8;i++){
     for(int j = 0;j<8;j++){
       if(i == 0 || i == 7){
@@ -39,6 +38,9 @@ int blackKingCount = 0;
     }
   }
   if(whiteKingCount!= 1 || blackKingCount != 1){
+    return false;
+  }
+  if(model->is_in_check(BLACK) || model->is_in_check(WHITE)){
     return false;
   }
   return true;
