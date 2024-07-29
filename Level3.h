@@ -4,10 +4,9 @@
 #include "Move.h"
 
 class Level3 : public ComputerPlayer {
- private:
-  // smart algo things
- public:
-  Move make_move();
+public:
+  Level3(ChessModel* model) : ComputerPlayer(model) {}
+  MOVE_RESULTS make_move(bool white_to_move) override;
 };
 
 #endif

@@ -41,6 +41,7 @@ public:
     void commit_move(Move m);
     void do_move(Move m);       // Actually updates board state
     void do_capture(Move m);    // Updates board and erases piece at m.end
+    void undo_move(Move m);
 
     MOVE_RESULTS check_for_mate() const;
     MOVE_RESULTS check_for_checks() const;
