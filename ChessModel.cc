@@ -97,8 +97,10 @@ bool ChessModel::is_in_check(COLOURS king_col) {
   for (int r = 0; r < 8; ++r) {
     for (int c = 0; c < 8; ++c) {
       if (board[r][c]->type != EMPTY && board[r][c]->col != king_col) {
+        Piece* p = board[r][c];
+        if(p == nullptr) std::cout << "GDBING my shi\n";
         MOVE_RESULTS r = check_pre_move(Move{ board[r][c]->loc, k->loc }, white_to_move);
-        if (r == CAPTURE_WITH_CHECK || r == PROMOTE_WITH_CHECK || r == MOVE_WITH_CHECK || r == CASTLE_WITH_CHECK || r == EN_PASSANT_WITH_CHECK) {
+        if (r != INVALID_MOVE) {
           return true;
         }
       }
@@ -310,6 +312,7 @@ void ChessModel::do_move(Move m) {
 
 // undo move
 void ChessModel::undo_move() {
+  std::cout << "UNDOING MOVE START\n";
   Move m = history.back();
   MOVE_RESULTS result = m.move_result;
   Piece* p = board[m.end.row][m.end.col];
@@ -401,7 +404,7 @@ void ChessModel::undo_move() {
   if (m.had_moved_prior == false) {
     board[m.start.row][m.end.row]->has_moved = false;
   }
-
+  std::cout << "UNDOING MOVE END\n";
 }
 
 Piece* ChessModel::at(std::string s) const {
@@ -434,6 +437,7 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
   result.taken_had_moved_prior = target->has_moved;
 
   commit_move(result);
+  std::cout << "I AM HERE PLEASE PLEASE PLEASE\n";
 
   if (result.check) {
     if(white_to_move) {
@@ -449,10 +453,11 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
   }
 
 
-
+  std::cout << "I AM HERE PLEASE\n";
   if(is_stalemate_for(BLACK)) {
     result.move_result = STALEMATE;
   }
+  std::cout << "NOW I AM HERE PLEASE\n";
 
   
 
@@ -466,6 +471,7 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
 void ChessModel::commit_move(Move m) {
   Piece* p = at(m.start);
   Piece* target = at(m.end);
+  m.print();
   switch (m.move_result) {
   case CASTLE:
   { // move rook
@@ -540,8 +546,8 @@ void ChessModel::commit_move(Move m) {
 
 Move ChessModel::is_valid(Move m, bool white_to_move) {
   MOVE_RESULTS pre = check_pre_move(m, white_to_move);
-  m.move_result = INVALID_MOVE;
   if (pre == INVALID_MOVE) return m;
+  m.move_result = pre;
   Move post = check_post_move(m, white_to_move);
   if (post.move_result == INVALID_MOVE) return post;
   return post; // contains move result and whether theres a check
@@ -840,7 +846,6 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
   }
   default:
   {
-    std::cout << "Not implemented yet, ignoring move";
     return INVALID_MOVE;
   }
   }
@@ -851,6 +856,7 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
 // Pre: check_pre_move has determined piecewise validity
 Move ChessModel::check_post_move(Move m, bool white_to_move) {
   commit_move(m);
+
   Move to_ret = m;
 
   bool temp_white_in_check = is_in_check(WHITE);
