@@ -1,6 +1,7 @@
 #include "ChessTextView.h"
 #include <iostream>
 #include "Piece.h"
+#include "utils.h"
 
 void ChessTextView::render() {
   std::cout << "- +-------------------------------+" << std::endl;
@@ -16,8 +17,8 @@ void ChessTextView::render() {
 }
 
 void ChessTextView::render(Piece* a, Piece* b) {
-  board[a->loc.row][a->loc.col] = a->letter;
-  board[b->loc.row][b->loc.col] = b->letter;
+  board[a->loc.row][a->loc.col] = piece_col_to_char(a->type, a->col);
+  board[b->loc.row][b->loc.col] = piece_col_to_char(b->type, b->col);
   this->render();
 }
 

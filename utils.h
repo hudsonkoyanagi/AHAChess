@@ -10,4 +10,7 @@ Cord str_to_cord(const std::string& str);
 void printPiece(PIECES piece) ;
 void printMoveResult(MOVE_RESULTS result) ;
 void printColour(COLOURS colour) ;
+
+char piece_col_to_char(PIECES p, COLOURS c);
+
 #endif

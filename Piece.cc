@@ -5,11 +5,10 @@ Piece::Piece(Cord c, COLOURS col, PIECES t, bool b ) : loc{ c }, col{ col }, typ
 void Piece::set_empty() {
     type = EMPTY;
     col = NONE;
-    letter = ' ';
 }
 
 bool Piece::is_empty() {
-    return type == EMPTY && col == NONE && letter == ' ';
+    return type == EMPTY && col == NONE;
 }
 
 int Piece::start_row() {
