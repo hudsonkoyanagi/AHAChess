@@ -39,8 +39,8 @@ void ChessController::input_loop() {
         p1_good = true;
         switch (second[8]) {
           case '1':
-            // p1 = new Level1{model};
-            p1 = nullptr;
+            p1 = new Level1{model};
+            // p1 = nullptr;
             break;
           case '2':
             // p1 = new Level2{model};
@@ -114,13 +114,20 @@ void ChessController::game_loop() {
   std::string start, end;
   while (std::cin >> command) {
     if (command == "move") {
-      std::cin >> start;
-      std::cin >> end;
-
-      if (!is_valid_cord(start) || !is_valid_cord(end)) {
-        std::cout << "Invalid chess coordinates, try again\n";
+      if(!(std::cin>>start)){
+        //verify if it is white's turn to move, white is a computer player
+        if(white_to_move && p1 != nullptr){
+          p1->make_move(white_to_move);
+        }
+        else if(!white_to_move && p2!= nullptr){
+          p2->make_move(white_to_move);
+        }
       }
-
+      else if(std::cin>>end){
+        if (!is_valid_cord(start) || !is_valid_cord(end)) {
+          std::cout << "Invalid chess coordinates, try again\n";
+        }
+      }
       MOVE_RESULTS res =
           model->make_move(Move{str_to_cord(start), str_to_cord(end)}, white_to_move);
       switch (res) {
