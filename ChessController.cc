@@ -118,8 +118,10 @@ void ChessController::game_loop() {
       MOVE_RESULTS res;
       //verify if it is white's turn to move, white is a computer player
       if (white_to_move && p1 != nullptr) {
+        std::cout<<"Bot moving WHITE"<<std::endl;
         res = p1->make_move(white_to_move);
       } else if (!white_to_move && p2 != nullptr) {
+        std::cout<<"Bot moving BLACK"<<std::endl;
         res = p2->make_move(white_to_move);
       } else {
         std::cin >> start >> end;
