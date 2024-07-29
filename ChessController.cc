@@ -231,40 +231,40 @@ void ChessController::setup_loop() {
       Cord currPos = str_to_cord(pos);
       switch(piece){
         case 'P':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,PAWN};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,PAWN};
           break;
         case 'R':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,ROOK};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,ROOK};
           break;
         case 'N':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,KNIGHT};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,KNIGHT};
           break;
         case 'B':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,BISHOP};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,BISHOP};
           break;
         case 'Q':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,QUEEN};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,QUEEN};
           break;
         case 'K':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,WHITE,KING};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,WHITE,KING};
           break;
         case 'p':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,PAWN};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,PAWN};
           break;
         case 'r':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,ROOK};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,ROOK};
           break;
         case 'n':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,KNIGHT};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,KNIGHT};
           break;
         case 'b':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,BISHOP};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,BISHOP};
           break;
         case 'q':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,QUEEN};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,QUEEN};
           break;
         case 'k':
-          model->board[currPos.row][currPos.col] = new Piece{piece,currPos,BLACK,KING};
+          model->board[currPos.row][currPos.col] = new Piece{currPos,BLACK,KING};
           break;
         default:
           std::cout<<"Invalid piece entered"<<std::endl;
