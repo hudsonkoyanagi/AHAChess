@@ -9,7 +9,7 @@
 
 
 bool is_valid_computer(const std::string& s) {
-  return s.length() == 9 && s.substr(0, 7) == "computer" && '1' <= s[8] &&
+  return s.length() == 9 && s.substr(0, 8) == "computer" && '1' <= s[8] &&
     s[8] <= '4';
 }
 
