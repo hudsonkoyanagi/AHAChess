@@ -7,22 +7,12 @@ enum COLOURS {
     NONE
 };
 
-// enum MOVE_RESULTS {
-//     BLACK_CHECKMATED, 
-//     WHITE_CHECKMATED,
-//     STALEMATE,
-//     SUCCESS,
-//     INVALID_MOVE,
-//     CAPTURE,
-//     PROMOTION,
-//     CASTLE,
-//     EN_PASSANT,
-//     CAPTURE_WITH_CHECK,
-//     PROMOTE_WITH_CHECK,
-//     MOVE_WITH_CHECK,
-//     CASTLE_WITH_CHECK,
-//     EN_PASSANT_WITH_CHECK
-// };
+enum MOVE_RESULTS {
+    STANDARD,
+    PROMOTION,
+    CASTLE,
+    EN_PASSANT,
+};
 
 enum PIECES {
     KING,

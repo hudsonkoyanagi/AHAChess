@@ -116,11 +116,17 @@ Piece *ChessModel::at(Cord c) const
 
 ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move)
 {
+  Move mv{start,end};
+  mv.moved = board[start.row][start.col]->type;
+  mv.had_moved_prior = board[start.row][start.col]->has_moved;
+  mv.taken_had_moved_prior = board[end.row][end.col]->has_moved;
+  mv.taken = board[end.row][end.col]->type;
+  char pie;
   bool en_passant = false;
   bool castle = false;
   bool promotion = false;
-
   Piece *p = at(start);
+
   if(white_to_move && p->col != WHITE) return FAILURE;
   if(!white_to_move && p->col != BLACK) return FAILURE;
 
@@ -128,7 +134,6 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
   bool found = false;
   for (auto c : valid_ends)
   {
-    // std::cout << "<"<< c.row << ", " << c.col << ">\n";
     if (c.col == end.col && c.row == end.row) {
       if (p->type == PAWN && white_to_move && end.row == 0) promotion = true;
       if (p->type == PAWN && !white_to_move && end.row == 7) promotion = true;
@@ -137,14 +142,12 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
       found = true;
     }
   }
-  if (!found)
-    return FAILURE;
+  if (!found) return FAILURE;
   // Move is semantically legal here
 
   std::array<std::array<Piece *, 8>, 8> temp_board = boardCopy();
 
   if(promotion){
-    char pie;
     std::cin>>pie;
     switch (pie) {
       case 'Q':
@@ -173,16 +176,18 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
     std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
   }
   else if(en_passant){
-
+    Piece* other_pawn = temp_board[start.row][end.col];
+    other_pawn->set_empty();
+    std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
   }
   else if(castle){
-    if (start.col > start.col) { // Queen side castle
-      std::swap(temp_board[start.row][3]->loc, temp_board[start.row][0]->loc);
+    std::cout << "WAHHHHHHH\n";
+    if (start.col > end.col) { // Queen side castle
       std::swap(temp_board[start.row][3], temp_board[start.row][0]);
     } else { // King side castle
-      std::swap(temp_board[start.row][5]->loc, temp_board[start.row][7]->loc);
       std::swap(temp_board[start.row][5], temp_board[start.row][7]);
     }
+    std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
   }
   else{
     Piece *target = temp_board[end.row][end.col];
@@ -190,15 +195,14 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
       target->set_empty();
     std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
   }
-
-
   bool is_white_temp_in_check = is_white_in_check(temp_board);
   bool is_black_temp_in_check = is_black_in_check(temp_board);
+  // bool is_in_stalemate = check_for_stalemate(white_to_move);
 
   ATTEMPT_RESULT ret;
 
   if (white_to_move && is_white_temp_in_check)
-  {
+  { // put yourself in check
     ret = FAILURE;
   }
   else if (white_to_move && is_black_temp_in_check)
@@ -206,9 +210,10 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
     // TODO: check for mate
     ret = BLACK_IN_CHECK;
     black_in_check = true;
+    mv.check = true;
   }
   else if (!white_to_move && is_black_temp_in_check)
-  {
+  {// put yourself in check
     ret = FAILURE;
   }
   else if (!white_to_move && is_white_temp_in_check)
@@ -216,6 +221,7 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
     // TODO: check for mate
     ret = WHITE_IN_CHECK;
     white_in_check = true;
+    mv.check = true;
   }
   else if (false)
   {
@@ -228,22 +234,70 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
   }
 
   if (ret != FAILURE)
-  {
-    // TODO: move history
-    Piece *target = board[end.row][end.col];
-    if (target->type != EMPTY && target->col != p->col)
-      target->set_empty();
-
-    std::swap(board[end.row][end.col], board[start.row][start.col]);
+  { // commit the move to real board
+    if(promotion){
+      mv.move_result = PROMOTION;
+      switch (pie) {
+        case 'Q':
+        case 'q':
+          board[start.row][start.col]->type = QUEEN;
+          break;
+        case 'R':
+        case 'r':
+          board[start.row][start.col]->type = ROOK;
+          break;
+        case 'B':
+        case 'b':
+          board[start.row][start.col]->type = BISHOP;
+          break;
+        case 'N':
+        case 'n':
+          board[start.row][start.col]->type = KNIGHT;
+          break;
+        default:
+          std::cout << "\nInvalid piece to promote to. Try again.\n";
+          return FAILURE;
+        }
+      Piece *target = board[end.row][end.col];
+      if (target->type != EMPTY && target->col != p->col)
+        target->set_empty();
+      std::swap(board[end.row][end.col], board[start.row][start.col]);
+    }
+    else if(en_passant){
+      mv.move_result = EN_PASSANT;
+      Piece* other_pawn = board[start.row][end.col];
+      other_pawn->set_empty();
+      std::swap(board[end.row][end.col], board[start.row][start.col]);   
+    }
+    else if(castle){
+      mv.move_result = CASTLE;
+      if (start.col > end.col) { // Queen side castle
+        std::swap(board[start.row][3], board[start.row][0]);
+      } else { // King side castle
+        std::swap(board[start.row][5], board[start.row][7]);
+      }
+      std::swap(board[end.row][end.col], board[start.row][start.col]);
+    }
+    else{
+      mv.move_result = STANDARD;
+      Piece *target = board[end.row][end.col];
+      if (target->type != EMPTY && target->col != p->col)
+        target->set_empty();
+      std::swap(board[end.row][end.col], board[start.row][start.col]);
+    }
+    history.push_back(mv);
   }
 
-  for (auto l : temp_board)
-    for (auto p : l)
-      delete p;
+  for (auto l : temp_board) for (auto p : l) delete p;
   for(auto v : views) {
     v->render(board);
   }
   return ret;
+}
+
+// PRE: white is in check before being called
+bool ChessModel::is_white_in_mate(std::array<std::array<Piece *, 8>, 8> &b) {
+  std::vector<Cord> moves;
 }
 
 bool ChessModel::is_white_in_check(std::array<std::array<Piece *, 8>, 8> &b)
@@ -307,7 +361,6 @@ Cord ChessModel::find_king(std::array<std::array<Piece *, 8>, 8> &b, COLOURS col
   return Cord { -1, -1 };
 }
 
-// F
 std::vector<Cord> ChessModel::get_all_valid_end_cords(Cord start, bool white_to_move)
 {
   Piece *p = at(start);
@@ -352,7 +405,6 @@ std::vector<Cord> ChessModel::get_all_valid_end_cords(Cord start, bool white_to_
   }
   return moves;
 }
-
 std::vector<Cord> ChessModel::get_all_valid_end_cords(Cord start, bool white_to_move,std::array<std::array<Piece *, 8>, 8> &b)
 {
   Piece *p = b[start.row][start.col];
@@ -737,25 +789,25 @@ bool ChessModel::is_valid_pawn_move(Cord start, Cord end) {
 
     if (board[end.row][end.col]->type == EMPTY) { // en passant
       // // both pawns are on the same row but adjacent columns
-      // Piece* other_pawn = board[start.row][end.col];
+      Piece* other_pawn = board[start.row][end.col];
 
-      // if (other_pawn->type == PAWN && other_pawn->col != p->col) {
-      //   // last move must be other pawn moving two forward
-      //   Move last_move = history[history.size() - 1];
-      //   if (last_move.moved != PAWN) {
+      if (other_pawn->type == PAWN && other_pawn->col != board[start.row][start.col]->col) {
+        // last move must be other pawn moving two forward
+        Move last_move = history[history.size() - 1];
+        if (last_move.moved != PAWN) {
 
-      //     return false;
-      //   }
-      //   if (abs(last_move.start.row - last_move.end.row) != 2) {
+          return false;
+        }
+        if (abs(last_move.start.row - last_move.end.row) != 2) {
 
-      //     return false;
-      //   }
-      //   if (last_move.start.col != last_move.end.col || last_move.start.col != end.col) {
+          return false;
+        }
+        if (last_move.start.col != last_move.end.col || last_move.start.col != end.col) {
 
-      //     return false;
-      //   }
-      //   return EN_PASSANT;
-      // }
+          return false;
+        }
+        return true;
+      }
       return false;
     }
   }
@@ -807,25 +859,25 @@ bool ChessModel::is_valid_pawn_move(Cord start, Cord end, std::array<std::array<
 
     if (b[end.row][end.col]->type == EMPTY) { // en passant
       // // both pawns are on the same row but adjacent columns
-      // Piece* other_pawn = b[start.row][end.col];
+      Piece* other_pawn = b[start.row][end.col];
 
-      // if (other_pawn->type == PAWN && other_pawn->col != p->col) {
-      //   // last move must be other pawn moving two forward
-      //   Move last_move = history[history.size() - 1];
-      //   if (last_move.moved != PAWN) {
+      if (other_pawn->type == PAWN && other_pawn->col != b[start.row][start.col]->col) {
+        // last move must be other pawn moving two forward
+        Move last_move = history[history.size() - 1];
+        if (last_move.moved != PAWN) {
 
-      //     return false;
-      //   }
-      //   if (abs(last_move.start.row - last_move.end.row) != 2) {
+          return false;
+        }
+        if (abs(last_move.start.row - last_move.end.row) != 2) {
 
-      //     return false;
-      //   }
-      //   if (last_move.start.col != last_move.end.col || last_move.start.col != end.col) {
+          return false;
+        }
+        if (last_move.start.col != last_move.end.col || last_move.start.col != end.col) {
 
-      //     return false;
-      //   }
-      //   return EN_PASSANT;
-      // }
+          return false;
+        }
+        return true;
+      }
       return false;
     }
   }

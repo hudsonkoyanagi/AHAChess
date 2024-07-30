@@ -7,14 +7,14 @@
 #include "Cord.h"
 #include "Enums.h"
 #include "Piece.h"
-// #include "Move.h"
+#include "Move.h"
 #include "ChessView.h"
 
 
 class ChessModel {
 private:
     std::array<std::array<Piece*, 8>, 8> board;
-    // std::vector<Move> history;
+    std::vector<Move> history;
     std::array<char, 8> white_pieces;
     std::array<char, 8> black_pieces;
     std::vector<ChessView*> views;
@@ -51,6 +51,8 @@ public:
     std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move);
     std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move,std::array<std::array<Piece *, 8>, 8>& b);
     Cord find_king(std::array<std::array<Piece *, 8>, 8>& b, COLOURS c);
+    bool is_white_in_mate(std::array<std::array<Piece *, 8>, 8> &b);
+
     bool is_white_in_check(std::array<std::array<Piece *, 8>, 8>& b);
     bool is_black_in_check(std::array<std::array<Piece *, 8>, 8>& b);
     bool is_valid_knight_move(Cord start, Cord end);
