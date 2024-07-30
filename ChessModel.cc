@@ -4,7 +4,7 @@
 #include "Piece.h"
 #include "cmath"
 #include "utils.h"
-
+#include <cassert>
 // Inits to starting board
 ChessModel::ChessModel() : pawn_to_promote{ -1, -1 } {
   board[0][0] = new Piece{ Cord{0, 0}, BLACK, ROOK };
@@ -86,6 +86,7 @@ Piece* ChessModel::find_king(COLOURS king_col) {
       }
     }
   }
+
 }
 
 // checking if the board has any checks
@@ -97,15 +98,12 @@ bool ChessModel::is_in_check(COLOURS king_col) {
   for (int r = 0; r < 8; ++r) {
     for (int c = 0; c < 8; ++c) {
       if (board[r][c]->type != EMPTY && board[r][c]->col != king_col) {
-        Piece* p = board[r][c];
-        if(p == nullptr) std::cout << "GDBING my shi\n";
-        MOVE_RESULTS r = check_pre_move(Move{ board[r][c]->loc, k->loc }, white_to_move);
-        if (r != INVALID_MOVE) {
-          return true;
-        }
+        MOVE_RESULTS r = check_pre_move(Move{ Cord{r,c}, k->loc }, white_to_move);
+        if (r != INVALID_MOVE) return true;
       }
     }
   }
+  return false;
 }
 
 // checks if one side is currently in stalemate
@@ -275,11 +273,9 @@ bool ChessModel::is_checkmate_for(COLOURS curr_col) {
       if (p->col == curr_col) {
         for (int m=0;m<8;++m) {
           for (int n=0;n<8;++n) {
-            MOVE_RESULTS curr_move = is_valid(Move{Cord{i,j},Cord{m,n} }, white_to_move);
-            if (curr_move != INVALID_MOVE) {
-              Move mv{ Cord{i,j}, Cord{m,n} };
-              mv.move_result = curr_move;
-              make_move(mv, white_to_move);
+            Move curr_move = is_valid(Move{Cord{r,c},Cord{m,n} }, white_to_move);
+            if (curr_move.move_result != INVALID_MOVE) {
+              make_move(curr_move, white_to_move);
               if(is_in_check(p->col)){
                 undo_move();
               }
@@ -303,7 +299,6 @@ void ChessModel::do_move(Move m) {
   std::swap(target->loc, p->loc);                                          // update piece location
   std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
 
-  history.push_back(m);
   p->has_moved = true;
   for (auto v : views) {
     v->render(board); // TODO FIX RENDERING
@@ -312,7 +307,8 @@ void ChessModel::do_move(Move m) {
 
 // undo move
 void ChessModel::undo_move() {
-  std::cout << "UNDOING MOVE START\n";
+  std::cout << history.size() << std::endl;
+  assert(history.size() > 0);
   Move m = history.back();
   MOVE_RESULTS result = m.move_result;
   Piece* p = board[m.end.row][m.end.col];
@@ -321,40 +317,50 @@ void ChessModel::undo_move() {
 
   switch (result) {
   case SUCCESS:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     break;
   case STALEMATE:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
+
     break;
   case BLACK_CHECKMATED:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     break;
   case WHITE_CHECKMATED:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     break;
   case CAPTURE:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     p->type = m.taken;
     p->col = opponent_colour;
     p->has_moved = m.taken_had_moved_prior;
     break;
   case EN_PASSANT:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     board[m.start.row][m.end.col]->type = m.taken;
     board[m.start.row][m.end.col]->col = opponent_colour;
     board[m.start.row][m.end.col]->has_moved = m.taken_had_moved_prior;
     break;
   case CASTLE:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     // king side castle
     if (m.end.col > m.start.col) {
       // if WHITE, swap rook to bot right
       if (player_colour == WHITE) {
+        std::swap(board[7][7]->loc, board[7][5]->loc);
         std::swap(board[7][7], board[7][5]);
         board[7][7]->has_moved = false;
       }
       // otherwise, swap rook to top right
       else {
+        std::swap(board[0][7]->loc, board[0][5]->loc);
         std::swap(board[0][7], board[0][5]);
         board[0][7]->has_moved = false;
       }
@@ -363,17 +369,20 @@ void ChessModel::undo_move() {
     else {
       // if WHITE, swap rook to bot left
       if (player_colour == WHITE) {
+        std::swap(board[7][0]->loc, board[7][3]->loc);
         std::swap(board[7][0], board[7][3]);
         board[7][0]->has_moved = false;
       }
       // otherwise, swap rook to top left
       else {
+        std::swap(board[0][0]->loc, board[0][3]->loc);
         std::swap(board[0][0], board[0][3]);
         board[0][0]->has_moved = false;
       }
     }
     break;
   case PROMOTION:
+    std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
     board[m.start.row][m.start.col]->type = PAWN;
     break;
@@ -391,7 +400,7 @@ void ChessModel::undo_move() {
   }
   // check if the previous was in check; undoing the move will redo the check
   else {
-    if (history.back().check) {
+    if (history.size() > 0 && history.back().check) {
       if (player_colour == WHITE) {
         white_in_check = true;
       } else {
@@ -402,9 +411,9 @@ void ChessModel::undo_move() {
 
   // check if the piece has moved prior; if not, then reset that flag for the piece
   if (m.had_moved_prior == false) {
-    board[m.start.row][m.end.row]->has_moved = false;
+    board[m.start.row][m.start.col]->has_moved = false;
   }
-  std::cout << "UNDOING MOVE END\n";
+  std::cout << "undo_move END\n";
 }
 
 Piece* ChessModel::at(std::string s) const {
@@ -431,16 +440,17 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
   if (result.move_result == INVALID_MOVE) {
     return result;
   }
+
   result.moved = p->type;
   result.taken = target->type;
   result.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
   result.taken_had_moved_prior = target->has_moved;
 
   commit_move(result);
-  std::cout << "I AM HERE PLEASE PLEASE PLEASE\n";
+
 
   if (result.check) {
-    if(white_to_move) {
+    if(white_to_move) { // black must be in check
       // check_for_mate() and handle
       black_in_check = true;
       white_in_check = false;
@@ -450,20 +460,11 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
       black_in_check =false;
       white_in_check = true;
     }
-  }
-
-
-  std::cout << "I AM HERE PLEASE\n";
-  if(is_stalemate_for(BLACK)) {
+  } else if(is_stalemate_for(BLACK)) {
+    result.move_result = STALEMATE;
+  } else if(is_stalemate_for(WHITE)) {
     result.move_result = STALEMATE;
   }
-  std::cout << "NOW I AM HERE PLEASE\n";
-
-  
-
-
-  // if(other col is in mate) return OTHER_IN_MATE;
-  std::cout << "Not finished, if you see this it's bad\n";
   return result;
 }
 
@@ -484,6 +485,7 @@ void ChessModel::commit_move(Move m) {
       std::swap(board[m.start.row][5], board[m.start.row][7]);
     }
     do_move(m);
+    history.push_back(m);
     break;
   }
 
@@ -491,11 +493,13 @@ void ChessModel::commit_move(Move m) {
   {                      // delete target - swap
     target->set_empty(); // only difference from standard move
     do_move(m);
+    history.push_back(m);
     break;
   }
   case SUCCESS:
   { // just a move
     do_move(m);
+    history.push_back(m);
     break;
   }
 
@@ -527,6 +531,7 @@ void ChessModel::commit_move(Move m) {
       }
     }
     do_move(m);
+    history.push_back(m);
     break;
   }
   case EN_PASSANT:
@@ -534,6 +539,7 @@ void ChessModel::commit_move(Move m) {
     Piece* other_pawn = board[m.start.row][m.end.col];
     other_pawn->set_empty();
     do_move(m);
+    history.push_back(m);
     break;
   }
   case INVALID_MOVE:
@@ -546,11 +552,10 @@ void ChessModel::commit_move(Move m) {
 
 Move ChessModel::is_valid(Move m, bool white_to_move) {
   MOVE_RESULTS pre = check_pre_move(m, white_to_move);
-  if (pre == INVALID_MOVE) return m;
   m.move_result = pre;
+  if (pre == INVALID_MOVE) return m;
   Move post = check_post_move(m, white_to_move);
-  if (post.move_result == INVALID_MOVE) return post;
-  return post; // contains move result and whether theres a check
+  return post;
 }
 
 // Check the piecewise validity of a move without regard for checks
@@ -584,8 +589,7 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
         return CAPTURE;
       }
 
-      if (target->type == EMPTY) {
-
+      if (target->type == EMPTY) { // en passant
         // both pawns are on the same row but adjacent columns
         Piece* other_pawn = board[m.start.row][m.end.col];
 
@@ -621,6 +625,7 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
         return INVALID_MOVE; // blocked
       if ((p->col == BLACK) && (board[2][m.start.col]->type != EMPTY))
         return INVALID_MOVE; // blocked
+
       return SUCCESS;
     }
 
@@ -862,7 +867,7 @@ Move ChessModel::check_post_move(Move m, bool white_to_move) {
   bool temp_white_in_check = is_in_check(WHITE);
   bool temp_black_in_check = is_in_check(BLACK);
 
-  if (white_to_move) {
+  if (white_to_move) { // m is made by white
     if (temp_white_in_check) {
       to_ret.move_result = INVALID_MOVE;
     } else if (temp_black_in_check) {
@@ -872,10 +877,10 @@ Move ChessModel::check_post_move(Move m, bool white_to_move) {
     if (temp_black_in_check) {
       to_ret.move_result = INVALID_MOVE;
     } else if (temp_white_in_check) {
-
       to_ret.check = true;
     }
   }
+  
   undo_move();
   return to_ret;
 }
