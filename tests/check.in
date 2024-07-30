@@ -1,15 +1,8 @@
 setup
 + K e1
-+ k e8
++ k h8
 + p f7
-+ Q h5
++ Q g6
 = black
 done
-move f7 f6
-move e8 f8
-move h5 f7
-move f8 e8
-move f8 e7
-move f8 g8
-move f8 g7
-move f8 f7
+move h8 h7

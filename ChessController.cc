@@ -107,6 +107,7 @@ void ChessController::game_loop()
       if (res != FAILURE) {
         if(res == WHITE_CHECKMATED) exit(1);
         if(res == BLACK_CHECKMATED) exit(1);
+        if(res == STALEMATE ) std::cout << "STALEMATE HAS OCCURRED\n";
         white_to_move = !white_to_move;
 
       } else {

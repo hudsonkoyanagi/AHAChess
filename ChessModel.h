@@ -55,6 +55,8 @@ public:
     Cord find_king(std::array<std::array<Piece *, 8>, 8>& b, COLOURS c);
     bool is_white_in_mate();
     bool is_black_in_mate();
+    bool is_white_stalemate();
+    bool is_black_stalemate();
 
     bool is_white_in_check(std::array<std::array<Piece *, 8>, 8>& b);
     bool is_black_in_check(std::array<std::array<Piece *, 8>, 8>& b);
