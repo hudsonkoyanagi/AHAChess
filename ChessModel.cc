@@ -267,31 +267,31 @@ bool ChessModel::is_stalemate_for(COLOURS curr_col) {
 
 // checks for checkmate, call it with the colour being checked for checkmate
 bool ChessModel::is_checkmate_for(COLOURS curr_col) {
-  bool white_to_move = (curr_col == WHITE) ? true : false;
-  //if we are currently in check then get out of check
-  for (int r = 0;r < 8;++r) {
-    for (int c = 0;c < 8;++c) {
-      Piece* p = board[r][c];
-      if (p->col == curr_col) {
-        for (int m=0;m<8;++m) {
-          for (int n=0;n<8;++n) {
-            MOVE_RESULTS curr_move = is_valid(Move{Cord{i,j},Cord{m,n} }, white_to_move);
-            if (curr_move != INVALID_MOVE) {
-              Move mv{ Cord{i,j}, Cord{m,n} };
-              mv.move_result = curr_move;
-              make_move(mv, white_to_move);
-              if(is_in_check(p->col)){
-                undo_move();
-              }
-              else {
-                return false;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  // bool white_to_move = (curr_col == WHITE) ? true : false;
+  // //if we are currently in check then get out of check
+  // for (int r = 0;r < 8;++r) {
+  //   for (int c = 0;c < 8;++c) {
+  //     Piece* p = board[r][c];
+  //     if (p->col == curr_col) {
+  //       for (int m=0;m<8;++m) {
+  //         for (int n=0;n<8;++n) {
+  //           MOVE_RESULTS curr_move = is_valid(Move{Cord{i,j},Cord{m,n} }, white_to_move);
+  //           if (curr_move != INVALID_MOVE) {
+  //             Move mv{ Cord{i,j}, Cord{m,n} };
+  //             mv.move_result = curr_move;
+  //             make_move(mv, white_to_move);
+  //             if(is_in_check(p->col)){
+  //               undo_move();
+  //             }
+  //             else {
+  //               return false;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   return true;
 }

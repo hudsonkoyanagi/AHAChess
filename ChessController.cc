@@ -17,6 +17,19 @@ bool is_valid_computer(const std::string& s) {
     s[8] <= '4';
 }
 
+void ChessController::print_board(){
+    std::cout << "- +-------------------------------+" << std::endl;
+
+  for (int r = 0; r < 8; r++) {
+    std::cout << 8 - r << " " << "|";
+    for (int c = 0; c < 8; c++) {
+      std::cout << " " << piece_col_to_char(model->board[r][c]->type,model->board[r][c]->col) << " |";
+    }
+    std::cout << std::endl << "- +-------------------------------+" << std::endl;
+  }
+  std::cout << "  | a | b | c | d | e | f | g | h |" << std::endl << std::endl;
+}
+
 bool ChessController::isValidBoard(){
 // you must verify that the board contains exactly one white king and exactly one black
 // king; that no pawns are on the first or last row of the board; and that neither king is in check. 
@@ -38,11 +51,12 @@ int blackKingCount = 0;
     }
   }
   if(whiteKingCount!= 1 || blackKingCount != 1){
+    // std::cout<<"failing here"<<std::endl;
     return false;
   }
-  if(model->is_in_check(BLACK) || model->is_in_check(WHITE)){
-    return false;
-  }
+  // if(model->is_in_check(BLACK) || model->is_in_check(WHITE)){
+  //   return false;
+  // }
   return true;
 }
 
@@ -228,6 +242,7 @@ void ChessController::setup_loop() {
         continue;
       }
       Cord currPos = str_to_cord(pos);
+      std::cout<<currPos.col<<","<<currPos.row<<std::endl;
       PIECES pieceType;
       COLOURS pieceColour;
       switch (piece) {
@@ -247,10 +262,10 @@ void ChessController::setup_loop() {
           std::cout << "Invalid piece entered" << std::endl;
           continue;
       }
-      Piece* targetPiece = model->board[currPos.row][currPos.col];
-      targetPiece->type = pieceType;
-      targetPiece->col = pieceColour;
-      targetPiece->loc = currPos;
+      model->board[currPos.row][currPos.col]->type = pieceType;
+      model->board[currPos.row][currPos.col]->col = pieceColour;
+      model->board[currPos.row][currPos.col]->loc = currPos;
+      print_board();
     }
     else if(command == "-"){
       std::cout<<"Removing a piece"<<std::endl;
