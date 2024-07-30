@@ -7,17 +7,19 @@
 #include "Cord.h"
 #include "Enums.h"
 #include "Piece.h"
-#include "Move.h"
+// #include "Move.h"
 #include "ChessView.h"
 
 
 class ChessModel {
 private:
     std::array<std::array<Piece*, 8>, 8> board;
-    std::vector<Move> history;
+    // std::vector<Move> history;
     std::array<char, 8> white_pieces;
     std::array<char, 8> black_pieces;
     std::vector<ChessView*> views;
+
+    
 
 
     bool white_in_check = false;
@@ -33,30 +35,7 @@ public:
     void reset();
     void empty();
 
-    Piece* find_king(COLOURS king_col);      // finds the piece of the white king
-    bool is_in_check(COLOURS king_col);     // checks if any piece is putting a king in check (param=true for search white, param=false for search black)
-
-    bool is_stalemate_for(COLOURS curr_col);    // checks if WHITE or BLACK is in stalemate
-    bool is_checkmate_for(COLOURS curr_col);    // checks if WHITE or BLACK is in checkmate
-
-    Move is_valid(Move m, bool white_to_move);
-    Move make_move(Move m, bool white_to_move);
-    void commit_move(Move m);
-    void do_move(Move m);       // Actually updates board state
-    void undo_move();
-
-    MOVE_RESULTS check_for_mate() ;
-    MOVE_RESULTS check_for_checks() ;
-
-    void setup_start(); // empties board
-    void setup_add_piece(char piece, Cord move);
-    void setup_rem_piece(Cord move);
-    void setup_set_turn(COLOURS col);
-    bool setup_finish(); // returns false if setup cannot be finished (invalid pawns, kings, etc)
-
-    MOVE_RESULTS check_pre_move(Move m, bool white_to_move);
-    Move check_post_move(Move m, bool white_to_move);
-
+    std::array<std::array<Piece*, 8>, 8> boardCopy();
 
     // helpers
     Piece* at(std::string s) const; // returns piece at cord string or nullptr if invalid
@@ -67,13 +46,36 @@ public:
 
     void register_view(ChessView* v);
 
+
+    ATTEMPT_RESULT attempt_move(Cord start, Cord end, bool white_to_move);
+    std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move);
+    std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move,std::array<std::array<Piece *, 8>, 8>& b);
+    Cord find_king(std::array<std::array<Piece *, 8>, 8>& b, COLOURS c);
+    bool is_white_in_check(std::array<std::array<Piece *, 8>, 8>& b);
+    bool is_black_in_check(std::array<std::array<Piece *, 8>, 8>& b);
+    bool is_valid_knight_move(Cord start, Cord end);
+    bool is_valid_knight_move(Cord start, Cord end, std::array<std::array<Piece*, 8>, 8>& b);
+    bool is_valid_rook_move(Cord start, Cord end);
+    bool is_valid_rook_move(Cord start, Cord end, std::array<std::array<Piece*, 8>, 8>& b);
+    bool is_valid_bishop_move(Cord start, Cord end);
+    bool is_valid_bishop_move(Cord start, Cord end, std::array<std::array<Piece*, 8>, 8>& b);
+    bool is_valid_queen_move(Cord start, Cord end);
+    bool is_valid_queen_move(Cord start, Cord end, std::array<std::array<Piece*, 8>, 8>& b);
+    bool is_valid_king_move(Cord start, Cord end);
+    bool is_valid_king_move(Cord start, Cord end, std::array<std::array<Piece*, 8>, 8>& b);
+    bool is_valid_pawn_move(Cord start, Cord end);
+    bool is_valid_pawn_move(Cord start, Cord end, std::array<std::array<Piece*, 8>, 8>& b);
+    
+
+
+
     // friend std::istream& operator>>(std::istream& is, ChessModel& b);
     // friend std::ostream& operator<<(std::ostream& os, const ChessModel& b);
-    friend class ComputerPlayer;
-    friend class Level1;
-    friend class Level2;
-    friend class Level3;
-    friend class Level4;
+    // friend class ComputerPlayer;
+    // friend class Level1;
+    // friend class Level2;
+    // friend class Level3;
+    // friend class Level4;
     friend class ChessController;
 };  
 
