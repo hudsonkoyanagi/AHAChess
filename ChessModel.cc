@@ -114,6 +114,10 @@ Piece *ChessModel::at(Cord c) const
   return board[c.row][c.col];
 }
 
+void make_move(Cord start,Cord end, std::array<std::array<Piece *, 8>, 8>& b){
+  
+}
+
 ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move)
 {
   Move mv{start, end};

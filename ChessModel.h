@@ -46,7 +46,7 @@ public:
 
     void register_view(ChessView* v);
 
-    void make_move()
+    void make_move(Cord start,Cord end, std::array<std::array<Piece *, 8>, 8>& b);
 
 
     ATTEMPT_RESULT attempt_move(Cord start, Cord end, bool white_to_move);
