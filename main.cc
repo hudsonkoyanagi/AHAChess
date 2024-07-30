@@ -13,14 +13,6 @@ int main() {
     // model.register_view(view);
     // model.register_view(view2);
     ChessController controller{&model};
-    // controller.input_loop();
-    controller.setup_loop();
-    
-
-    // model.attempt_move(Cord{7,1}, Cord{5,2}, true);
-
-    
-
-    // controller.input_loop();
+    controller.input_loop();
     return 0;
 }
