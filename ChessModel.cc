@@ -307,13 +307,16 @@ void ChessModel::do_move(Move m) {
 
 // undo move
 void ChessModel::undo_move() {
+  std::cout << "Staring undo move\n";
   std::cout << history.size() << std::endl;
   assert(history.size() > 0);
   Move m = history.back();
+  std::cout << "------" << std::endl;
+  m.print();
+  std::cout << "------" << std::endl;
   MOVE_RESULTS result = m.move_result;
-  Piece* p = board[m.end.row][m.end.col];
-  COLOURS player_colour = p->col;
-  COLOURS opponent_colour = (p->col == WHITE) ? BLACK : WHITE;
+  COLOURS player_colour = board[m.end.row][m.end.col]->col;
+  COLOURS opponent_colour = (board[m.end.row][m.end.col]->col == WHITE) ? BLACK : WHITE;
 
   switch (result) {
   case SUCCESS:
@@ -336,9 +339,9 @@ void ChessModel::undo_move() {
   case CAPTURE:
     std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
     std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]);
-    p->type = m.taken;
-    p->col = opponent_colour;
-    p->has_moved = m.taken_had_moved_prior;
+    board[m.end.row][m.end.col]->type = m.taken;
+    board[m.end.row][m.end.col]->col = opponent_colour;
+    board[m.end.row][m.end.col]->has_moved = m.taken_had_moved_prior;
     break;
   case EN_PASSANT:
     std::swap(board[m.start.row][m.start.col]->loc, board[m.end.row][m.end.col]->loc);
@@ -413,7 +416,7 @@ void ChessModel::undo_move() {
   if (m.had_moved_prior == false) {
     board[m.start.row][m.start.col]->has_moved = false;
   }
-  std::cout << "undo_move END\n";
+  std::cout << "Ending undo_move\n";
 }
 
 Piece* ChessModel::at(std::string s) const {
@@ -433,18 +436,18 @@ Piece* ChessModel::at(Cord c) const {
 }
 
 Move ChessModel::make_move(Move m, bool white_to_move) {
+  std::cout << "Starting make move\n";
   Piece* p = at(m.start);
   Piece* target = at(m.end);
+  m.moved = p->type;
+  m.taken = target->type;
+  m.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
+  m.taken_had_moved_prior = target->has_moved;
 
   Move result = is_valid(m, white_to_move);
   if (result.move_result == INVALID_MOVE) {
     return result;
   }
-
-  result.moved = p->type;
-  result.taken = target->type;
-  result.had_moved_prior = p->has_moved; // allows us to undo move so castling can still be done
-  result.taken_had_moved_prior = target->has_moved;
 
   commit_move(result);
 
@@ -460,16 +463,19 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
       black_in_check =false;
       white_in_check = true;
     }
-  } else if(is_stalemate_for(BLACK)) {
-    result.move_result = STALEMATE;
-  } else if(is_stalemate_for(WHITE)) {
-    result.move_result = STALEMATE;
   }
+  // } else if(is_stalemate_for(BLACK)) {
+  //   result.move_result = STALEMATE;
+  // } else if(is_stalemate_for(WHITE)) {
+  //   result.move_result = STALEMATE;
+  // }
+  std::cout << "Ending make move\n";
   return result;
 }
 
 // Makes the move M, requires the move result from check validity
 void ChessModel::commit_move(Move m) {
+  std::cout << "Starting commit move\n";
   Piece* p = at(m.start);
   Piece* target = at(m.end);
   m.print();
@@ -547,6 +553,7 @@ void ChessModel::commit_move(Move m) {
     std::cerr << "Something terrible has happend in commit move\n";
     return;
   }
+  std::cout << "Ending commit move\n";
 }
 
 
