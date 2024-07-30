@@ -6,7 +6,7 @@
 class Level1 : public ComputerPlayer {
 public:
   Level1(ChessModel* model) : ComputerPlayer(model) {}
-  Move make_move(bool white_to_move) override;
+  ATTEMPT_RESULT make_move(bool white_to_move) override;
 };
 
 #endif
