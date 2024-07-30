@@ -52,7 +52,6 @@ bool ChessController::isValidBoard() {
     }
   }
   if (whiteKingCount != 1 || blackKingCount != 1) {
-    // std::cout<<"failing here"<<std::endl;
     return false;
   }
   // if(model->is_in_check(BLACK) || model->is_in_check(WHITE)){
