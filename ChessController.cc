@@ -150,27 +150,51 @@ void ChessController::game_loop() {
   std::string start, end;
   while (std::cin >> command) {
     if (command == "move") {
+      ATTEMPT_RESULT res;
+      bool human_move =false;
 
-      if(p1_is_white) {
-        if(white_to_move) {
-          if (p1 == nullptr) std::cin >> start >> end;
+      if(p1_is_white && white_to_move) {
+        if(p1 == nullptr) {
+          std::cin >> start >> end;
+          human_move = true;
         } else {
-          
+          res = p1->make_move(true);
         }
-
-      } else { // p1_is_black
-
+      } else if (p1_is_white && !white_to_move) {
+        if(p2 == nullptr) {
+          std::cin >> start >> end;
+          human_move = true;
+        } else {
+          res = p2->make_move(false);
+        }
+      } else if (!p1_is_white && !white_to_move) {
+        if (p1 == nullptr) {
+          std::cin >> start >> end;
+          human_move = true;
+        } else {
+          res = p1->make_move(false);
+        }
+      } else { //(!p1_is_white && white_to_move) 
+        if (p2 == nullptr) {
+          std::cin >> start >> end;
+          human_move = true;
+        } else {
+          res = p2->make_move(true);
+        }
+      }
+      if(human_move) {
+        
       }
 
 
-      std::cin >> start >> end;
+
 
       if (!is_valid_cord(start) || !is_valid_cord(end)) {
         std::cout << "Invalid chess coordinates: <" << start << ", " << end << "> Please try again\n";
         continue; // retry loop
       }
 
-      ATTEMPT_RESULT res = model->attempt_move(str_to_cord(start), str_to_cord(end), white_to_move);
+      res = model->attempt_move(str_to_cord(start), str_to_cord(end), white_to_move);
 
       switch (res) {
       case WHITE_CHECKMATED:
