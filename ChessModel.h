@@ -47,7 +47,8 @@ public:
     void make_move(Cord start,Cord end, std::array<std::array<Piece *, 8>, 8>& b, bool);
 
 
-    ATTEMPT_RESULT attempt_move(Cord start, Cord end, bool white_to_move);
+    ATTEMPT_RESULT attempt_move(Cord start, Cord end, bool white_to_move,bool isBot = false);
+    std::pair<ATTEMPT_RESULT,Move> attempt_move_no_commit(Cord start, Cord end, bool white_to_move);
     std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move);
     std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move,std::array<std::array<Piece *, 8>, 8>& b);
     Cord find_king(std::array<std::array<Piece *, 8>, 8>& b, COLOURS c);
@@ -78,7 +79,7 @@ public:
     // friend std::ostream& operator<<(std::ostream& os, const ChessModel& b);
     friend class ComputerPlayer;
     friend class Level1;
-    // friend class Level2;
+    friend class Level2;
     // friend class Level3;
     // friend class Level4;
     friend class ChessController;
