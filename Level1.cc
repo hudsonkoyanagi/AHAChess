@@ -25,10 +25,11 @@ ATTEMPT_RESULT Level1::make_move(bool white_to_move) {
                         moves.push_back(mv);
                     }
                 }
-            } else if (currPiece->col == BLACK && !white_to_move) {
-                temp = model->get_all_valid_end_cords(Cord{i,j},!white_to_move);
+            } 
+            else if (currPiece->col == BLACK && !white_to_move) {
+                temp = model->get_all_valid_end_cords(Cord{i,j},white_to_move);
                 for(auto c: temp){
-                    std::pair<ATTEMPT_RESULT,Move> p = model->attempt_move_no_commit(Cord{i,j},c,!white_to_move);
+                    std::pair<ATTEMPT_RESULT,Move> p = model->attempt_move_no_commit(Cord{i,j},c,white_to_move);
                     ATTEMPT_RESULT ar = p.first;
                     Move mv = p.second;
                     if(ar != FAILURE){
@@ -38,15 +39,14 @@ ATTEMPT_RESULT Level1::make_move(bool white_to_move) {
             }
         }
     }
-    while (!moves.empty()) {
+    // std::cout<<"valid_moves size "<<moves.size()<<std::endl;
+    // for(int i = 0;i<moves.size();i++){
+    //     std::cout<<moves[i].move_result<<std::endl;
+    // }
+    if(!moves.empty()){
         int randIndex = std::rand() % moves.size();
         ATTEMPT_RESULT validAttempt = model->attempt_move(moves[randIndex].start,moves[randIndex].end,white_to_move,true);
-        if(validAttempt == FAILURE){
-            moves.erase(moves.begin() + randIndex);
-        }
-        else{
-            return validAttempt;
-        }
+        return validAttempt;
     }
     return FAILURE; // something went wrong
 }

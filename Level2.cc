@@ -38,9 +38,9 @@ ATTEMPT_RESULT Level2::make_move(bool white_to_move) {
                     }
                 }
             } else if (currPiece->col == BLACK && !white_to_move) {
-                temp = model->get_all_valid_end_cords(Cord{i,j},!white_to_move);
+                temp = model->get_all_valid_end_cords(Cord{i,j},white_to_move);
                 for(auto c: temp){
-                    std::pair<ATTEMPT_RESULT,Move> p = model->attempt_move_no_commit(Cord{i,j},c,!white_to_move);
+                    std::pair<ATTEMPT_RESULT,Move> p = model->attempt_move_no_commit(Cord{i,j},c,white_to_move);
                     ATTEMPT_RESULT ar = p.first;
                     Move mv = p.second;
                     if(ar != FAILURE){
@@ -59,10 +59,12 @@ ATTEMPT_RESULT Level2::make_move(bool white_to_move) {
         }
     }
 
+    std::cout << check_moves.size() << std::endl;
+
     //iterate thru checks
     while(!check_moves.empty()){
         int randIndex = std::rand() % check_moves.size();
-        ATTEMPT_RESULT validAttempt = model->attempt_move(check_moves[randIndex].start,check_moves[randIndex].start,white_to_move,true);
+        ATTEMPT_RESULT validAttempt = model->attempt_move(check_moves[randIndex].start,check_moves[randIndex].end,white_to_move,true);
         if(validAttempt == FAILURE){
             check_moves.erase(check_moves.begin() + randIndex);
         }
@@ -70,10 +72,12 @@ ATTEMPT_RESULT Level2::make_move(bool white_to_move) {
             return validAttempt;
         }
     }
+
+    std::cout << capture_moves.size() << std::endl;
     
     while(!capture_moves.empty()){
         int randIndex = std::rand() % capture_moves.size();
-        ATTEMPT_RESULT validAttempt = model->attempt_move(capture_moves[randIndex].start,capture_moves[randIndex].start,white_to_move,true);
+        ATTEMPT_RESULT validAttempt = model->attempt_move(capture_moves[randIndex].start,capture_moves[randIndex].end,white_to_move,true);
         if(validAttempt == FAILURE){
             capture_moves.erase(capture_moves.begin() + randIndex);
         }
@@ -82,10 +86,12 @@ ATTEMPT_RESULT Level2::make_move(bool white_to_move) {
         }
     }
 
+    std::cout << standard_moves.size() << std::endl;
+
 
     while(!standard_moves.empty()){
         int randIndex = std::rand() % standard_moves.size();
-        ATTEMPT_RESULT validAttempt = model->attempt_move(standard_moves[randIndex].start,standard_moves[randIndex].start,white_to_move,true);
+        ATTEMPT_RESULT validAttempt = model->attempt_move(standard_moves[randIndex].start,standard_moves[randIndex].end,white_to_move,true);
         if(validAttempt == FAILURE){
             standard_moves.erase(standard_moves.begin() + randIndex);
         }
