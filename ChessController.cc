@@ -8,6 +8,7 @@
 #include "Enums.h"
 #include "Level1.h"
 #include "Level2.h"
+#include "Level3.h"
 
 bool is_valid_computer(const std::string& s) {
   return s.length() == 9 && s.substr(0, 8) == "computer" && '1' <= s[8] &&
@@ -84,7 +85,7 @@ void ChessController::input_loop() {
           p1_good = true;
           break;
           case '2': p1 = new Level2{ model }; p1_good = true; break;
-          // case '3': p1 = new Level3{ model }; p1_good = true; break;
+          case '3': p1 = new Level3{ model }; p1_good = true; break;
           // case '4': p1 = new Level4{ model }; p1_good = true; break;
         default:
           std::cout << "Invalid player: '" << second << "' Please try again.\n";
@@ -113,7 +114,7 @@ void ChessController::input_loop() {
           p2_good = true;
           break;
           case '2': p2 = new Level2{ model }; p2_good = true; break;
-          // case '3': p2 = new Level3{ model }; p2_good = true; break;
+          case '3': p2 = new Level3{ model }; p2_good = true; break;
           // case '4': p2 = new Level4{ model }; p2_good = true; break;
         default:
           std::cout << "Invalid player: '" << third << "' Please try again.\n";
