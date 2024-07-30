@@ -185,11 +185,9 @@ void ChessController::game_loop() {
         if (white_to_move) {
           std::cout << "Black is in check.\n";
           white_to_move = !white_to_move;
-          break;
         } else {
           std::cout << "White is in check.\n";
           white_to_move = !white_to_move;
-          break;
 
         }
       } else {

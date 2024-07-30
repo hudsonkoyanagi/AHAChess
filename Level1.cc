@@ -17,13 +17,14 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
                 for (int m = 0; m < 8;++m) {
                     for (int n = 0;n < 8;++n) {
                         std::cout << "";
-                        // std::cout<<"Are you running"<<std::endl;
-                        MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n}}, white_to_move).move_result;
-                        if (currMove != INVALID_MOVE) {
-                            // std::cout<<"Are you running"<<std::endl;
-                            Move mv{Cord{i,j},Cord{m,n}};
-                            mv.move_result = currMove;
-                            valid_moves.push_back(mv);
+                        Move to_make{ Cord{i,j}, Cord{m,n} };
+                        to_make.moved = model->board[i][j]->type;
+                        to_make.taken = model->board[m][n]->type;
+                        to_make.had_moved_prior = model->board[i][j]->has_moved;
+                        to_make.taken_had_moved_prior = model->board[m][n]->has_moved;
+                        Move currMove = model->is_valid(to_make, white_to_move);
+                        if (currMove.move_result != INVALID_MOVE) {
+                            valid_moves.push_back(currMove);
                         }
                     }
                 }
@@ -31,11 +32,14 @@ MOVE_RESULTS Level1::make_move(bool white_to_move) {
                 for (int m = 0;m < 8;++m) {
                     for (int n = 0;n < 8;++n) {
                         std::cout << "";
-                        MOVE_RESULTS currMove = model->is_valid(Move{ Cord{i,j},Cord{m,n} }, white_to_move).move_result;
-                        if (currMove != INVALID_MOVE) {
-                            Move mv{ Cord{i,j}, Cord{m,n} };
-                            mv.move_result = currMove;
-                            valid_moves.push_back(mv);
+                        Move to_make{ Cord{i,j}, Cord{m,n} };
+                        to_make.moved = model->board[i][j]->type;
+                        to_make.taken = model->board[m][n]->type;
+                        to_make.had_moved_prior = model->board[i][j]->has_moved;
+                        to_make.taken_had_moved_prior = model->board[m][n]->has_moved;
+                        Move currMove = model->is_valid(to_make, white_to_move);
+                        if (currMove.move_result != INVALID_MOVE) {
+                            valid_moves.push_back(currMove);
                         }
                     }
                 }

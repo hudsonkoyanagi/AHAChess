@@ -300,9 +300,9 @@ void ChessModel::do_move(Move m) {
   std::swap(board[m.start.row][m.start.col], board[m.end.row][m.end.col]); // update board
 
   p->has_moved = true;
-  for (auto v : views) {
-    v->render(board); // TODO FIX RENDERING
-  }
+  // for (auto v : views) {
+  //   v->render(board); // TODO FIX RENDERING
+  // }
 }
 
 // undo move
@@ -469,6 +469,13 @@ Move ChessModel::make_move(Move m, bool white_to_move) {
   // } else if(is_stalemate_for(WHITE)) {
   //   result.move_result = STALEMATE;
   // }
+  
+
+  for (auto v : views) {
+    std::cout << "trying to print\n";
+    v->render(board); // TODO FIX RENDERING
+  }
+
   std::cout << "Ending make move\n";
   return result;
 }
@@ -868,6 +875,8 @@ MOVE_RESULTS ChessModel::check_pre_move(Move m, bool white_to_move) {
 // Pre: check_pre_move has determined piecewise validity
 Move ChessModel::check_post_move(Move m, bool white_to_move) {
   commit_move(m);
+  std::cout << "Checking post move\n";
+  m.print();
 
   Move to_ret = m;
 
