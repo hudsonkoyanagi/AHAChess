@@ -139,7 +139,6 @@ void ChessModel::make_move(Cord start, Cord end, std::array<std::array<Piece *, 
     std::swap(b[end.row][end.col], b[start.row][start.col]);
   }
 
-  std::cout << start.row << " " << start.col << " " << end.row << " " << end.col << std::endl;
 }
 
 ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move)
@@ -265,18 +264,6 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
     white_in_check = true;
     mv.check = true;
   }
-  else if (is_white_stalemate() || is_black_stalemate()) // TODO: stalemate
-  {
-    ret = STALEMATE;
-    for (auto l : temp_board)
-    for (auto p : l)
-      delete p;
-    for (auto v : views)
-    {
-      v->render(board);
-    }
-    return ret;
-  }
   else
   {
     white_in_check = false;
@@ -353,6 +340,10 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
   {
     if (is_black_in_mate())
       ret = BLACK_CHECKMATED;
+  }
+  else if (is_white_stalemate() || is_black_stalemate()) // TODO: stalemate
+  {
+    ret = STALEMATE;
   }
 
   for (auto l : temp_board)
@@ -473,19 +464,18 @@ bool ChessModel::is_black_stalemate() {
       {
         Cord start{r, c};
         std::vector<Cord> some_moves = get_all_valid_end_cords(start, false, board);
-        std::cout << "type stalemate: " << board[r][c]->type << std::endl;
 
         for (auto cor : some_moves)
         {
           auto b = boardCopy();
           make_move(start, cor, b, false);
-          if (cor.row == 1 && cor.col == 7) assert(b[1][7]->type == KING);
+          if (cor.row == 1 && cor.col == 7) {
+          }
           if (!is_black_in_check(b))
           {
             for (auto l : b)
               for (auto p : l)
                 delete p;
-            std::cout << "one that caused no check: " << cor.row << " " << cor.col << std::endl;
             return false;
           }
           for (auto l : b)
@@ -525,7 +515,6 @@ bool ChessModel::is_white_in_check(std::array<std::array<Piece *, 8>, 8> &b)
 bool ChessModel::is_black_in_check(std::array<std::array<Piece *, 8>, 8> &b)
 {
   Cord k_loc = find_king(b, BLACK);
-  std::cout << "k_loc: " << k_loc.row << " " << k_loc.col << std::endl;
   // checking for check
   for (int r = 0; r < 8; ++r)
   {
@@ -533,11 +522,9 @@ bool ChessModel::is_black_in_check(std::array<std::array<Piece *, 8>, 8> &b)
     {
       if (b[r][c]->col == WHITE)
       {
-        std::cout << "check type" << board[r][c]->type << std::endl;
         std::vector<Cord> moves = get_all_valid_end_cords(Cord{r, c}, true, b);
         for (auto cord : moves)
         {
-          std::cout << "white move: " << cord.row << ", " << cord.col << std::endl;
           if (cord.row == k_loc.row && cord.col == k_loc.col) // our own king is under attack after our own move (illegal)
           {
             return true;
