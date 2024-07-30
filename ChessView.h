@@ -9,6 +9,8 @@ class ChessView {
 protected:
     std::array<std::array<char, 8>, 8> board;
 public:
+
+    virtual ~ChessView() {};
  // sets the state of the whole board
  void init_board(const std::array<std::array<Piece*, 8>, 8>& b);
 

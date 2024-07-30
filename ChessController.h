@@ -21,7 +21,8 @@ public:
     bool isValidBoard();
     void print_board();
 
-    ChessController(ChessModel* m) : model{m} {}
+    ChessController(ChessModel* m);
+    ~ChessController();
 };
 
 #endif

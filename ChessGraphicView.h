@@ -12,6 +12,7 @@ class ChessGraphicView : public ChessView {
     const int tile_length;
   public:
     ChessGraphicView(int size = 800);
+    ~ChessGraphicView();
     
     // renders based on internal state only
     void render();

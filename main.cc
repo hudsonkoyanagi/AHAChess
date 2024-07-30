@@ -6,12 +6,10 @@
 
 int main() {
     ChessTextView *tv = new ChessTextView{};
-    ChessGraphicView *view = new ChessGraphicView{500};
-    // ChessGraphicView *view2 = new ChessGraphicView{};
+    ChessGraphicView *view2 = new ChessGraphicView{1000};
     ChessModel model;
     model.register_view(tv);
-    model.register_view(view);
-    // model.register_view(view2);
+    model.register_view(view2);
     ChessController controller{&model};
     controller.input_loop();
     return 0;

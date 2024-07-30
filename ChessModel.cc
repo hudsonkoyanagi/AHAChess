@@ -328,7 +328,7 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
   } else if (ret == BLACK_IN_CHECK) {
     if (is_black_in_mate())
       ret = BLACK_CHECKMATED;
-  } else if (is_white_stalemate() || is_black_stalemate()) // TODO: stalemate
+  } else if (is_white_stalemate() || is_black_stalemate()) 
   {
     ret = STALEMATE;
   }
