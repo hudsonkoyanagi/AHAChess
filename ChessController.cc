@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "utils.h"
 #include "Enums.h"
+#include "Level1.h"
 
 bool is_valid_computer(const std::string& s) {
   return s.length() == 9 && s.substr(0, 8) == "computer" && '1' <= s[8] &&
@@ -57,9 +58,6 @@ bool ChessController::isValidBoard() {
   return true;
 }
 
-Player* str_to_player(const std::string& s) {
-  return nullptr;
-}
 
 void ChessController::input_loop() {
   std::string command;
@@ -78,8 +76,65 @@ void ChessController::input_loop() {
 
       std::cin >> second >> third;
 
+      if (is_valid_computer(second)) {
+        switch (second[8]) {
+        case '1': 
+          p1 = new Level1{ model }; 
+          p1_good = true; 
+          break;
+        // case '2': p1 = new Level2{ model }; p1_good = true; break;
+        // case '3': p1 = new Level3{ model }; p1_good = true; break;
+        // case '4': p1 = new Level4{ model }; p1_good = true; break;
+        default: 
+          std::cout << "Invalid player: '" << second << "' Please try again.\n";
+          p1_good = false;
+          p2_good = false;
+          delete p1;
+          delete p2;
+          continue;
+        }
+      } else if (second == "human") {
+        p1 = nullptr;
+        p1_good = true;
+      } else {
+        std::cout << "Invalid player: '" << second << "' Please try again.\n";
+        p1_good = false;
+        p2_good = false;
+        delete p1;
+        delete p2;
+        continue;
+      }
 
-      game_loop();
+      if (is_valid_computer(third)) {
+        switch (third[8]) {
+        case '1':
+          p2 = new Level1{ model };
+          p2_good = true;
+          break;
+          // case '2': p2 = new Level2{ model }; p2_good = true; break;
+          // case '3': p2 = new Level3{ model }; p2_good = true; break;
+          // case '4': p2 = new Level4{ model }; p2_good = true; break;
+        default:
+          std::cout << "Invalid player: '" << third << "' Please try again.\n";
+          p1_good = false;
+          p2_good = false;
+          delete p1;
+          delete p2;
+          continue;
+        }
+      } else if (third == "human") {
+        p2 = nullptr;
+        p2_good = true;
+      } else {
+        std::cout << "Invalid player: '" << third << "' Please try again.\n";
+        p1_good = false;
+        p2_good = false;
+        delete p1;
+        delete p2;
+        continue;
+      }
+
+      if(p1_good && p2_good) game_loop();
       model->reset();
     } else if (command == "setup") {
       setup_loop();
@@ -95,6 +150,19 @@ void ChessController::game_loop() {
   std::string start, end;
   while (std::cin >> command) {
     if (command == "move") {
+
+      if(p1_is_white) {
+        if(white_to_move) {
+          if (p1 == nullptr) std::cin >> start >> end;
+        } else {
+          
+        }
+
+      } else { // p1_is_black
+
+      }
+
+
       std::cin >> start >> end;
 
       if (!is_valid_cord(start) || !is_valid_cord(end)) {
@@ -160,7 +228,7 @@ void ChessController::setup_loop() {
       std::cin >> piece;
       std::cin >> pos;
       if (!is_valid_cord(pos)) {
-        std::cout << "invalid coord" << std::endl;
+        std::cout << "Invalid coord" << std::endl;
         continue;
       }
       Cord currPos = str_to_cord(pos);
