@@ -39,6 +39,10 @@ ChessModel::ChessModel() : pawn_to_promote{-1, -1}
   board[7][5] = new Piece{Cord{7, 5}, WHITE, BISHOP};
   board[7][6] = new Piece{Cord{7, 6}, WHITE, KNIGHT};
   board[7][7] = new Piece{Cord{7, 7}, WHITE, ROOK};
+
+  for(auto v : views) {
+    v->render(this->board);
+  }
 }
 
 ChessModel::~ChessModel()
@@ -387,10 +391,12 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
   for (auto l : temp_board)
     for (auto p : l)
       delete p;
-  for (auto v : views)
-  {
-    v->render(board);
+  if(ret != FAILURE) {
+    for (auto v : views) {
+      v->render(at(start), start, at(end),end);
+    }
   }
+  
 
   return ret;
 }

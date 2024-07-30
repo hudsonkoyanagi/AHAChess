@@ -19,8 +19,6 @@ private:
     std::array<char, 8> black_pieces;
     std::vector<ChessView*> views;
 
-    
-
 
     bool white_in_check = false;
     bool black_in_check = false;

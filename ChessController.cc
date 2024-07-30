@@ -152,6 +152,8 @@ void ChessController::game_loop() {
   if (p1_is_white) std::cout << "Player 1 has the white pieces.\n";
   else std::cout << "Player 2 has the white pieces.\n";
 
+  model->notify_views();
+
   std::string command;
   std::string start, end;
 

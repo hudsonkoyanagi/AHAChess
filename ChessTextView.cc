@@ -16,9 +16,9 @@ void ChessTextView::render() {
   std::cout << "  | a | b | c | d | e | f | g | h |" << std::endl << std::endl;
 }
 
-void ChessTextView::render(Piece* a, Piece* b) {
-  board[a->loc.row][a->loc.col] = piece_col_to_char(a->type, a->col);
-  board[b->loc.row][b->loc.col] = piece_col_to_char(b->type, b->col);
+void ChessTextView::render(Piece* a, Cord a_cord, Piece* b, Cord b_cord) {
+  board[a_cord.row][a_cord.col] = piece_col_to_char(a->type, a->col);
+  board[b_cord.row][b_cord.col] = piece_col_to_char(b->type, b->col);
   this->render();
 }
 

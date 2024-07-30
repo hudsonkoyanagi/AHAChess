@@ -17,13 +17,12 @@ Xwindow::Xwindow(int width, int height) {
   }
   s = DefaultScreen(d);
   w = XCreateSimpleWindow(d, RootWindow(d, s), 10, 10, width, height, 1,
-                          BlackPixel(d, s), WhitePixel(d, s));
+    BlackPixel(d, s), WhitePixel(d, s));
   XSelectInput(d, w, ExposureMask | KeyPressMask);
   XMapRaised(d, w);
 
-  Pixmap pix = XCreatePixmap(d,w,width,
-        height,DefaultDepth(d,DefaultScreen(d)));
-  gc = XCreateGC(d, pix, 0,(XGCValues *)0);
+  Pixmap pix = XCreatePixmap(d, w, width, height, DefaultDepth(d, DefaultScreen(d)));
+  gc = XCreateGC(d, pix, 0, (XGCValues*)0);
 
   XFlush(d);
   XFlush(d);
@@ -31,33 +30,33 @@ Xwindow::Xwindow(int width, int height) {
   // Set up colours.
   XColor xcolour;
   Colormap cmap;
-  char color_vals[10][10]={"white", "black", "red", "green", "blue", "cyan", "yellow", "magenta", "orange", "brown"};
+  char color_vals[12][10] = { "white", "black", "red", "green", "blue", "cyan", "yellow", "lightgray", "orange", "brown", "purple", "pink" };
 
-  cmap=DefaultColormap(d,DefaultScreen(d));
-  for(int i=0; i < 5; ++i) {
-      XParseColor(d,cmap,color_vals[i],&xcolour);
-      XAllocColor(d,cmap,&xcolour);
-      colours[i]=xcolour.pixel;
+  cmap = DefaultColormap(d, DefaultScreen(d));
+  for (int i = 0; i < 12; ++i) {
+    XParseColor(d, cmap, color_vals[i], &xcolour);
+    XAllocColor(d, cmap, &xcolour);
+    colours[i] = xcolour.pixel;
   }
 
-  XSetForeground(d,gc,colours[Black]);
+  XSetForeground(d, gc, colours[Black]);
 
   // Make window non-resizeable.
   XSizeHints hints;
-  hints.flags = (USPosition | PSize | PMinSize | PMaxSize );
+  hints.flags = (USPosition | PSize | PMinSize | PMaxSize);
   hints.height = hints.base_height = hints.min_height = hints.max_height = height;
   hints.width = hints.base_width = hints.min_width = hints.max_width = width;
   XSetNormalHints(d, w, &hints);
 
-  XSynchronize(d,True);
+  XSynchronize(d, True);
 
   usleep(1000);
 
   // Make sure we don't race against the Window being shown
   XEvent ev;
-  while(1) {
+  while (1) {
     XNextEvent(d, &ev);
-    if(ev.type == Expose) break;
+    if (ev.type == Expose) break;
   }
 }
 

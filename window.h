@@ -5,27 +5,27 @@
 #include <string>
 
 class Xwindow {
-  Display *d;
+  Display* d;
   Window w;
   int s;
   GC gc;
-  unsigned long colours[10];
+  unsigned long colours[12];  // Adjust size to accommodate new colors
 
- public:
-  Xwindow(int width=500, int height=500);  // Constructor; displays the window.
+
+public:
+  Xwindow(int width = 500, int height = 500);  // Constructor; displays the window.
   ~Xwindow();                              // Destructor; destroys the window.
   Xwindow(const Xwindow&) = delete;
-  Xwindow &operator=(const Xwindow&) = delete;
+  Xwindow& operator=(const Xwindow&) = delete;
 
   // Available colours.
-  enum {White=0, Black, Red, Green, Blue, Cyan, Yellow, Magenta, Orange, Brown};
+  enum { White = 0, Black, Red, Green, Blue, Cyan, Yellow, LightGray, Orange, Brown, Purple, Pink };
 
   // Draws a rectangle
-  void fillRectangle(int x, int y, int width, int height, int colour=Black);
+  void fillRectangle(int x, int y, int width, int height, int colour = Black);
 
   // Draws a string
   void drawString(int x, int y, std::string msg);
-
 };
 
 #endif
