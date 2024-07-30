@@ -141,7 +141,7 @@ void ChessModel::make_move(Cord start, Cord end, std::array<std::array<Piece *, 
 
 }
 
-ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move)
+ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move, bool isBot)
 {
   Move mv{start, end};
   mv.moved = board[start.row][start.col]->type;
@@ -184,7 +184,12 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
 
   if (promotion)
   {
-    std::cin >> pie;
+    if(!isBot){
+      std::cin >> pie;
+    }
+    else{
+      pie = 'Q';
+    }
     switch (pie)
     {
     case 'Q':
@@ -1298,4 +1303,196 @@ bool ChessModel::is_valid_pawn_move(Cord start, Cord end, std::array<std::array<
   }
 
   return false;
+}
+
+std::pair<ATTEMPT_RESULT,Move> ChessModel::attempt_move_no_commit(Cord start, Cord end, bool white_to_move)
+{
+  Move mv{start, end};
+  ATTEMPT_RESULT ret = FAILURE;
+  mv.moved = board[start.row][start.col]->type;
+  mv.had_moved_prior = board[start.row][start.col]->has_moved;
+  mv.taken_had_moved_prior = board[end.row][end.col]->has_moved;
+  mv.taken = board[end.row][end.col]->type;
+  char pie;
+  bool en_passant = false;
+  bool castle = false;
+  bool promotion = false;
+  
+  Piece *p = at(start);
+
+  if (white_to_move && p->col != WHITE){
+    return std::make_pair(ret,mv);
+  }
+  if (!white_to_move && p->col != BLACK){
+    return std::make_pair(ret,mv);
+  }
+
+  std::vector<Cord> valid_ends = get_all_valid_end_cords(start, white_to_move);
+  bool found = false;
+  for (auto c : valid_ends)
+  {
+    if (c.col == end.col && c.row == end.row)
+    {
+      if (p->type == PAWN && white_to_move && end.row == 0)
+        promotion = true;
+      if (p->type == PAWN && !white_to_move && end.row == 7)
+        promotion = true;
+      if (p->type == PAWN && start.col != end.col && board[end.row][end.col]->type == EMPTY)
+        en_passant = true;
+      if (p->type == KING && abs(end.col - start.col) == 2)
+        castle = true;
+      found = true;
+    }
+  }
+  if (!found)
+    return std::make_pair(ret,mv);
+  // Move is semantically legal here
+
+  std::array<std::array<Piece *, 8>, 8> temp_board = boardCopy();
+
+  if (promotion)
+  {
+    temp_board[start.row][start.col]->type = QUEEN;
+    Piece *target = temp_board[end.row][end.col];
+    if (target->type != EMPTY && target->col != p->col)
+      target->set_empty();
+    std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
+  }
+  else if (en_passant)
+  {
+    Piece *other_pawn = temp_board[start.row][end.col];
+    other_pawn->set_empty();
+    std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
+  }
+  else if (castle)
+  {
+    if (start.col > end.col)
+    { // Queen side castle
+      std::swap(temp_board[start.row][3], temp_board[start.row][0]);
+    }
+    else
+    { // King side castle
+      std::swap(temp_board[start.row][5], temp_board[start.row][7]);
+    }
+    std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
+  }
+  else
+  {
+    Piece *target = temp_board[end.row][end.col];
+    if (target->type != EMPTY && target->col != p->col)
+      target->set_empty();
+    std::swap(temp_board[end.row][end.col], temp_board[start.row][start.col]);
+  }
+  bool is_white_temp_in_check = is_white_in_check(temp_board);
+  bool is_black_temp_in_check = is_black_in_check(temp_board);
+  
+
+
+  if ((white_to_move && is_white_temp_in_check) || (!white_to_move && is_black_temp_in_check))
+  { // put yourself in check
+    for (auto l : temp_board)
+      for (auto p : l)
+        delete p;
+    return std::make_pair(ret,mv);
+  }
+
+  if (white_to_move && is_black_temp_in_check)
+  {
+    ret = BLACK_IN_CHECK;
+    black_in_check = true;
+    mv.check = true;
+  }
+  else if (!white_to_move && is_white_temp_in_check)
+  {
+    ret = WHITE_IN_CHECK;
+    white_in_check = true;
+    mv.check = true;
+  }
+  else
+  {
+    white_in_check = false;
+    black_in_check = false;
+    ret = SUCCESS;
+  }
+
+  //if promotion then the value that it will get called with is that it will just be Q
+  if (promotion)
+  {
+    mv.move_result = PROMOTION;
+    // switch (pie)
+    // {
+    // case 'Q':
+    // case 'q':
+    //   board[start.row][start.col]->type = QUEEN;
+    //   break;
+    // case 'R':
+    // case 'r':
+    //   board[start.row][start.col]->type = ROOK;
+    //   break;
+    // case 'B':
+    // case 'b':
+    //   board[start.row][start.col]->type = BISHOP;
+    //   break;
+    // case 'N':
+    // case 'n':
+    //   board[start.row][start.col]->type = KNIGHT;
+    //   break;
+    // default:
+    //   std::cout << "\nInvalid piece to promote to. Try again.\n";
+    //   return FAILURE;
+    // }
+    // Piece *target = board[end.row][end.col];
+    // if (target->type != EMPTY && target->col != p->col)
+    //   target->set_empty();
+    // std::swap(board[end.row][end.col], board[start.row][start.col]);
+  }
+  else if (en_passant)
+  {
+    mv.move_result = EN_PASSANT;
+    // Piece *other_pawn = board[start.row][end.col];
+    // other_pawn->set_empty();
+    // std::swap(board[end.row][end.col], board[start.row][start.col]);
+  }
+  else if (castle)
+  {
+    mv.move_result = CASTLE;
+    if (start.col > end.col)
+    { // Queen side castle
+      // std::swap(board[start.row][3], board[start.row][0]);
+    }
+    else
+    { // King side castle
+      // std::swap(board[start.row][5], board[start.row][7]);
+    }
+    // std::swap(board[end.row][end.col], board[start.row][start.col]);
+  }
+  else
+  {
+    mv.move_result = STANDARD;
+    // Piece *target = board[end.row][end.col];
+    // if (target->type != EMPTY && target->col != p->col)
+    //   target->set_empty();
+    // std::swap(board[end.row][end.col], board[start.row][start.col]);
+  }
+
+  if (ret == WHITE_IN_CHECK)
+  {
+    if (is_white_in_mate())
+      ret = WHITE_CHECKMATED;
+  }
+  else if (ret == BLACK_IN_CHECK)
+  {
+    if (is_black_in_mate())
+      ret = BLACK_CHECKMATED;
+  }
+  else if (is_white_stalemate() || is_black_stalemate()) 
+  {
+    ret = STALEMATE;
+  }
+
+  for (auto l : temp_board)
+    for (auto p : l)
+      delete p;
+
+  return std::make_pair(ret,mv);
 }
