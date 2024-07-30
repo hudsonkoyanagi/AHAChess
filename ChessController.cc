@@ -78,14 +78,14 @@ void ChessController::input_loop() {
 
       if (is_valid_computer(second)) {
         switch (second[8]) {
-        case '1': 
-          p1 = new Level1{ model }; 
-          p1_good = true; 
+        case '1':
+          p1 = new Level1{ model };
+          p1_good = true;
           break;
-        // case '2': p1 = new Level2{ model }; p1_good = true; break;
-        // case '3': p1 = new Level3{ model }; p1_good = true; break;
-        // case '4': p1 = new Level4{ model }; p1_good = true; break;
-        default: 
+          // case '2': p1 = new Level2{ model }; p1_good = true; break;
+          // case '3': p1 = new Level3{ model }; p1_good = true; break;
+          // case '4': p1 = new Level4{ model }; p1_good = true; break;
+        default:
           std::cout << "Invalid player: '" << second << "' Please try again.\n";
           p1_good = false;
           p2_good = false;
@@ -134,8 +134,10 @@ void ChessController::input_loop() {
         continue;
       }
 
-      if(p1_good && p2_good) game_loop();
+      if (p1_good && p2_good) game_loop();
       model->reset();
+      p1_is_white = !p1_is_white;
+      white_to_move = true;
     } else if (command == "setup") {
       setup_loop();
     } else {
@@ -145,41 +147,62 @@ void ChessController::input_loop() {
 }
 
 void ChessController::game_loop() {
-  std::cout << "Game beginning, white to move\n";
+
+  std::cout << "Game beginning!\n";
+  if (p1_is_white) std::cout << "Player 1 has the white pieces.\n";
+  else std::cout << "Player 2 has the white pieces.\n";
+
   std::string command;
   std::string start, end;
+
   while (std::cin >> command) {
     if (command == "move") {
+      ATTEMPT_RESULT res;
+      bool human_move = false;
 
-      if(p1_is_white) {
-        if(white_to_move) {
-          if (p1 == nullptr) std::cin >> start >> end;
-        } else {
-          
+
+      if ((p1_is_white && white_to_move) || (!p1_is_white && !white_to_move)) { // p1 to move
+        if (p1 == nullptr) {
+          human_move = true;
+          std::cout << "p1 is human\n";
         }
+        else {
+          res = p1->make_move(white_to_move);
+          human_move = false;
+          std::cout << "p1 is computer\n";
+        }
+      } else if ((p1_is_white && !white_to_move) || (!p1_is_white && white_to_move)) { // p2 to move
+        if (p2 == nullptr) {
+          human_move = true;
+          std::cout << "p2 is human\n";
+        }
+        else {
+          res = p2->make_move(white_to_move);
+          human_move = false;
+          std::cout << "p2 is computer\n";
+        }
+      }
 
-      } else { // p1_is_black
-
+      if (human_move) {
+        human_move = false;
+        std::cin >> start >> end;
+        if (!is_valid_cord(start) || !is_valid_cord(end)) {
+          std::cout << "Invalid chess coordinates: <" << start << ", " << end << "> Please try again\n";
+          continue; // retry loop
+        }
+        res = model->attempt_move(str_to_cord(start), str_to_cord(end), white_to_move);
       }
 
 
-      std::cin >> start >> end;
-
-      if (!is_valid_cord(start) || !is_valid_cord(end)) {
-        std::cout << "Invalid chess coordinates: <" << start << ", " << end << "> Please try again\n";
-        continue; // retry loop
-      }
-
-      ATTEMPT_RESULT res = model->attempt_move(str_to_cord(start), str_to_cord(end), white_to_move);
 
       switch (res) {
       case WHITE_CHECKMATED:
-        std::cout << "Checkmate! White wins!\n";
-        white_wins++;
-        return;
-      case BLACK_CHECKMATED:
         std::cout << "Checkmate! Black wins!\n";
         black_wins++;
+        return;
+      case BLACK_CHECKMATED:
+        std::cout << "Checkmate! White wins!\n";
+        white_wins++;
         return;
       case STALEMATE:
         std::cout << "Stalemate!\n";
@@ -204,8 +227,10 @@ void ChessController::game_loop() {
       }
     } else if (command == "resign") {
       if (white_to_move) {
+        std::cout << "White resigned. Black wins!\n";
         black_wins++;
       } else {
+        std::cout << "Black resigned. White wins!\n";
         white_wins++;
       }
       return;
