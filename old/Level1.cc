@@ -6,7 +6,7 @@
 #include <iostream>
 
 //random legal moves that will be checked by randomly picking a piece and picking a random possible location
-MOVE_RESULTS Level1::make_move(bool white_to_move) {
+Move Level1::make_move(bool white_to_move) {
     std::cout << "Computer 1 making move\n";
     //iterate through board and then for each we see if
     std::vector<Move> valid_moves;

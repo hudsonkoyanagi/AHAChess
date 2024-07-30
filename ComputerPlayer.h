@@ -9,7 +9,7 @@ protected:
 public:
     ComputerPlayer(ChessModel* model) : model(model) {}
     virtual ~ComputerPlayer() {}
-    virtual MOVE_RESULTS make_move(bool white_to_move) = 0;
+    virtual Move make_move(bool white_to_move) = 0;
 };
 
 #endif
