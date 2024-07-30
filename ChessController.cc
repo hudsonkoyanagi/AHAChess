@@ -105,7 +105,10 @@ void ChessController::game_loop()
       // MAKE MOVE
       ATTEMPT_RESULT res = model->attempt_move(str_to_cord(start), str_to_cord(end), white_to_move);
       if (res != FAILURE) {
+        if(res == WHITE_CHECKMATED) exit(1);
+        if(res == BLACK_CHECKMATED) exit(1);
         white_to_move = !white_to_move;
+
       } else {
         std::cout << "invalid move. try again \n";
       }

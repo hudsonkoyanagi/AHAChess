@@ -3,8 +3,6 @@ setup
 + K e1
 + R a1
 + R h1
-+ P a7
-+ b b8
++ r d8
 done
-move a7 b8 Q
-move e8 e7
+move e1 c1

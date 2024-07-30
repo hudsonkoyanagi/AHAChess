@@ -114,8 +114,30 @@ Piece *ChessModel::at(Cord c) const
   return board[c.row][c.col];
 }
 
-void make_move(Cord start,Cord end, std::array<std::array<Piece *, 8>, 8>& b){
-  
+// only call for checks - skips many things
+void ChessModel::make_move(Cord start, Cord end, std::array<std::array<Piece *, 8>, 8> &b, bool white_to_move)
+{
+  Piece *p = b[start.row][start.col];
+  bool en_passant = false;
+
+  if (p->type == PAWN && start.col != end.col && b[end.row][end.col]->type == EMPTY)
+    en_passant = true;
+  if (p->type == KING && abs(end.col - start.col) == 2)
+    return; // can't castle in check
+
+  if (en_passant)
+  {
+    Piece *other_pawn = b[start.row][end.col];
+    other_pawn->set_empty();
+    std::swap(b[end.row][end.col], b[start.row][start.col]);
+  }
+  else
+  {
+    Piece *target = b[end.row][end.col];
+    if (target->type != EMPTY && target->col != p->col)
+      target->set_empty();
+    std::swap(b[end.row][end.col], b[start.row][start.col]);
+  }
 }
 
 ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move)
@@ -313,10 +335,13 @@ ATTEMPT_RESULT ChessModel::attempt_move(Cord start, Cord end, bool white_to_move
 
   if (ret == WHITE_IN_CHECK)
   {
-    
+    if (is_white_in_mate())
+      ret = WHITE_CHECKMATED;
   }
   else if (ret == BLACK_IN_CHECK)
   {
+    if (is_black_in_mate())
+      ret = BLACK_CHECKMATED;
   }
 
   for (auto l : temp_board)
@@ -337,24 +362,65 @@ bool ChessModel::is_white_in_mate()
   {
     for (int c = 0; c < 8; ++c)
     {
-      
+
       if (board[r][c]->col == WHITE)
       {
         Cord start{r, c};
         std::vector<Cord> some_moves = get_all_valid_end_cords(start, true, board);
-        
+
         for (auto cor : some_moves)
         {
           auto b = boardCopy();
-          make_move(start, cor, b);
+          make_move(start, cor, b, true);
           if (!is_white_in_check(b))
-            for(auto l : b) for(auto p : l) delete p;
+          {
+            for (auto l : b)
+              for (auto p : l)
+                delete p;
             return false;
-          for(auto l : b) for(auto p : l) delete p;
+          }
+          for (auto l : b)
+            for (auto p : l)
+              delete p;
         }
       }
     }
   }
+  return true;
+}
+
+bool ChessModel::is_black_in_mate()
+{
+  for (int r = 0; r < 8; ++r)
+  {
+    for (int c = 0; c < 8; ++c)
+    {
+
+      if (board[r][c]->col == BLACK)
+      {
+        Cord start{r, c};
+        std::vector<Cord> some_moves = get_all_valid_end_cords(start, false, board);
+
+        for (auto cor : some_moves)
+        {
+          auto b = boardCopy();
+          make_move(start, cor, b, false);
+          if (!is_black_in_check(b))
+          {
+            for (auto l : b)
+              for (auto p : l)
+                delete p;
+
+            return false;
+          }
+          for (auto l : b)
+            for (auto p : l)
+              delete p;
+        }
+      }
+    }
+  }
+  return true;
 }
 
 bool ChessModel::is_white_in_check(std::array<std::array<Piece *, 8>, 8> &b)
@@ -752,31 +818,98 @@ bool ChessModel::is_valid_king_move(Cord start, Cord end)
 
     if (board[start.row][start.col]->col == WHITE)
     {
-      if (start.col > start.col)
+      if (start.col > end.col)
       { // Queen side castle
-        if (!(at("b1")->is_empty()) || !(at("c1")->is_empty()) || !(at("d1")->is_empty()))
+        if (!(at("b1")->is_empty()) || !(at("c1")->is_empty()) || !(at("d1")->is_empty())){
           return false;
-      }
+        }
+          //check for  d1
+          //iterate thru all black pieces, and then we iterate thru all of their end_moves, and then see if any of
+          //them are d1, if true then return false
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == BLACK){
+                if(board[r][c]->type == KING && r == 0){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, false);
+                  for(auto c: valid_ends){
+                    //d1
+                    if(c.row == 7 && c.col == 3){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
+      } 
       else
       { // King side castle
         if (!(at("f1")->is_empty()) || !(at("g1")->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == BLACK){
+                if(board[r][c]->type == KING && r == 0){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, false);
+                  for(auto c: valid_ends){
+                    //f1
+                    if(c.row == 7 && c.col == 5){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
       }
     }
     else
     {
-      if (start.col > start.col)
+      if (start.col > end.col)
       { // Queen side castle
         if (!(at("b8")->is_empty()) || !(at("c8")->is_empty()) || !(at("d8")->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == WHITE){
+                if(board[r][c]->type == KING && r == 7){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, true);
+                  for(auto c: valid_ends){
+                    //d8
+                    if(c.row == 0 && c.col == 3){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
       }
       else
       { // King side castle
         if (!(at("f8")->is_empty()) || !(at("g8")->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == WHITE){
+                if(board[r][c]->type == KING && r == 7){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, true);
+                  for(auto c: valid_ends){
+                    //f8
+                    if(c.row == 0 && c.col == 5){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
       }
     }
-
     return true;
   }
 
@@ -834,28 +967,89 @@ bool ChessModel::is_valid_king_move(Cord start, Cord end, std::array<std::array<
 
     if (b[start.row][start.col]->col == WHITE)
     {
-      if (start.col > start.col)
+      if (start.col > end.col)
       { // Queen side castle
         if (!(b[str_to_cord("b1").row][str_to_cord("b1").col]->is_empty()) || !(b[str_to_cord("c1").row][str_to_cord("c1").col]->is_empty()) || !(b[str_to_cord("d1").row][str_to_cord("d1").col]->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == BLACK){
+                if(board[r][c]->type == KING && r == 0){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, false);
+                  for(auto c: valid_ends){
+                    if(c.row == 7 && c.col == 3){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
       }
       else
       { // King side castle
         if (!(b[str_to_cord("f1").row][str_to_cord("f1").col]->is_empty()) || !(b[str_to_cord("g1").row][str_to_cord("g1").col]->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == BLACK){
+                if(board[r][c]->type == KING && r == 0){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, false);
+                  for(auto c: valid_ends){
+                    if(c.row == 7 && c.col == 5){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
+
       }
     }
     else
     {
-      if (start.col > start.col)
+      if (start.col > end.col)
       { // Queen side castle
         if (!(b[str_to_cord("b8").row][str_to_cord("b8").col]->is_empty()) || !(b[str_to_cord("c8").row][str_to_cord("c8").col]->is_empty()) || !(b[str_to_cord("d8").row][str_to_cord("d8").col]->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == WHITE){
+                if(board[r][c]->type == KING && r == 7){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, true);
+                  for(auto c: valid_ends){
+                    if(c.row == 0 && c.col == 3){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
       }
       else
       { // King side castle
         if (!(b[str_to_cord("f8").row][str_to_cord("f8").col]->is_empty()) || !(b[str_to_cord("g8").row][str_to_cord("g8").col]->is_empty()))
           return false;
+          for(int r = 0;r<8;r++){
+            for(int c = 0;c<8;c++){
+              if(board[r][c]->col == WHITE){
+                if(board[r][c]->type == KING && r == 7){
+                  continue;
+                }
+                  std::vector<Cord> valid_ends = get_all_valid_end_cords(Cord{r,c}, true);
+                  for(auto c: valid_ends){
+                    if(c.row == 0 && c.col == 5){ 
+                      return false;
+                    } 
+                  }
+              }
+            }
+          }
       }
     }
 

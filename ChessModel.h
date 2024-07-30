@@ -46,7 +46,7 @@ public:
 
     void register_view(ChessView* v);
 
-    void make_move(Cord start,Cord end, std::array<std::array<Piece *, 8>, 8>& b);
+    void make_move(Cord start,Cord end, std::array<std::array<Piece *, 8>, 8>& b, bool);
 
 
     ATTEMPT_RESULT attempt_move(Cord start, Cord end, bool white_to_move);
@@ -54,6 +54,7 @@ public:
     std::vector<Cord> get_all_valid_end_cords(Cord start, bool white_to_move,std::array<std::array<Piece *, 8>, 8>& b);
     Cord find_king(std::array<std::array<Piece *, 8>, 8>& b, COLOURS c);
     bool is_white_in_mate();
+    bool is_black_in_mate();
 
     bool is_white_in_check(std::array<std::array<Piece *, 8>, 8>& b);
     bool is_black_in_check(std::array<std::array<Piece *, 8>, 8>& b);
